@@ -1,34 +1,33 @@
-import { Card } from "./Card";
-import { Deck } from "./Deck";
-import { Player } from "./Player";
+import { Card } from './Card'
+import { Deck } from './Deck'
+import { Player } from './Player'
 
 export class Table {
-  private gameType: string;
-  private betDenomination: number[];
-  private gamePhase: string;
-  private turnCorner: number;
-  private resultsLog: string[];
-  private deck: Deck;
-  private players: Player[];
-  private house: Player;
+  private gameType: string
+  private betDenomination: number[]
+  private deck: Deck
+  private players: Player[]
+  private house: Player
+  private gamePhase: string
+  private turnCorner: number
+  private resultsLog: string[]
 
   constructor(gameType: string, betDenomination: number[] = [5, 20, 50, 100]) {
-    this.gameType = gameType;
-    this.betDenomination = betDenomination;
-    this.turnCorner = 0;
-    this.resultsLog = [];
-    this.gamePhase = "betting";
-
-    this.deck = new Deck(gameType);
-    this.deck.shuffle();
+    this.gameType = gameType
+    this.betDenomination = betDenomination
+    this.gamePhase = 'betting'
+    this.deck = new Deck(gameType)
+    this.deck.shuffle()
+    this.turnCorner = 0
+    this.resultsLog = []
 
     this.players = [
-      new Player("ai1", "ai", this.gameType),
-      new Player("ai2", "ai", this.gameType),
-      new Player("ai3", "ai", this.gameType),
-    ];
+      new Player('ai1', 'ai', this.gameType),
+      new Player('ai2', 'ai', this.gameType),
+      new Player('ai3', 'ai', this.gameType),
+    ]
 
-    this.house = new Player("house", "house", this.gameType);
+    this.house = new Player('house', 'house', this.gameType)
   }
 
   /*
@@ -43,36 +42,36 @@ export class Table {
         NOTE: このメソッドの出力は、各ラウンドの終了時にテーブルのresultsLogメンバを更新するために使用されます。
     */
   blackjackEvaluateAndGetRoundResults(): string {
-    return "";
+    return ''
   }
 
   public blackjackAssignPlayerHands(): void {
     for (const player of this.players) {
-      const hand: Card[] | undefined = this.checkNotUndefinedAndGetTwo();
-      if (hand !== undefined) player.setHand(hand);
+      const hand: Card[] | undefined = this.checkNotUndefinedAndGetTwo()
+      if (hand !== undefined) player.setHand(hand)
     }
   }
 
   private checkNotUndefinedAndGetTwo(): Card[] | undefined {
-    const card1: Card | undefined = this.deck.drawOne();
-    const card2: Card | undefined = this.deck.drawOne();
+    const card1: Card | undefined = this.deck.drawOne()
+    const card2: Card | undefined = this.deck.drawOne()
 
-    if (card1 !== undefined && card2 !== undefined) return [card1, card2];
-    else return undefined;
+    if (card1 !== undefined && card2 !== undefined) return [card1, card2]
+    else return undefined
   }
 
   blackjackClearPlayerHandsAndBets(): void {
     for (const player of this.players) {
-      player.clearHand();
-      player.clearBet();
+      player.clearHand()
+      player.clearBet()
     }
 
-    this.house.clearHand();
-    this.house.clearBet();
+    this.house.clearHand()
+    this.house.clearBet()
   }
 
   getTurnPlayer(): Player {
-    return this.players[this.turnCorner % this.players.length];
+    return this.players[this.turnCorner % this.players.length]
   }
 
   /*
@@ -80,28 +79,27 @@ export class Table {
        return null: このメソッドはテーブルの状態を更新するだけで、値を返しません。
     */
   public haveTurn(userData: number): void {
-    if (this.gamePhase === "roundOver") return;
-    const currentPlayer: Player = this.getTurnPlayer();
+    if (this.gamePhase === 'roundOver') return
+    const currentPlayer: Player = this.getTurnPlayer()
     // プレイヤーに行動を促す。 userDataはとりあえず 1
-    currentPlayer.promptPlayer(1);
-    this.turnCorner++;
+    currentPlayer.promptPlayer(1)
+    this.turnCorner++
   }
 
   onFirstPlayer(): boolean {
-    return this.turnCorner % this.players.length === 0;
+    return this.turnCorner % this.players.length === 0
   }
 
   onLastPlayer(): boolean {
-    return this.turnCorner % this.players.length === 2;
+    return this.turnCorner % this.players.length === 2
   }
 
   // acting フェーズを終了させるために使う
   allPlayerActionsResolved(): boolean {
-    for (const player of this.players) {
-      const status: string = player.getGameStatus();
-      if (["broken", "bust", "stand", "surrender"].indexOf(status) === 1)
-        return false;
-    }
-    return true;
+    const resolvedPlayers = this.players.filter((player: Player) => {
+      const status: string = player.getGameStatus()
+      return status === 'broken' || status === 'stand' || status === 'bust' || status === 'surrender'
+    })
+    return resolvedPlayers.length === this.players.length
   }
 }

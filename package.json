@@ -18,7 +18,6 @@
   "bugs": {
     "url": "https://github.com/Teradad41/Gard_Game/issues"
   },
-  "homepage": "https://github.com/Teradad41/Gard_Game#readme",
   "devDependencies": {
     "autoprefixer": "^10.4.14",
     "cssnano": "^6.0.1",

@@ -1,25 +1,25 @@
 export class GameDecision {
-  private action: string;
-  private amount: number;
+  private action: string
+  private amount: number
 
   constructor(action: string, amount: number) {
-    this.action = action;
-    this.amount = amount;
+    this.action = action
+    this.amount = amount
   }
 
   public getAction(): string {
-    return this.action;
+    return this.action
   }
 
   public getAmount(): number {
-    return this.amount;
+    return this.amount
   }
 
   public setAction(action: string): void {
-    this.action = action;
+    this.action = action
   }
 
   public setAmount(amount: number): void {
-    this.amount = amount;
+    this.amount = amount
   }
 }
