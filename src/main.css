@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "playfair Display SC";
+  src: url("/assets/fonts/PlayfairDisplaySC-Bold.ttf");
+}
+
+body {
+    font-family: 'Playfair Display SC', serif;
+}
+
+.background-container {
+  @apply absolute top-0 left-0 w-full h-full bg-cover bg-no-repeat bg-center;
+  background-image: url('/assets/images/start-background.jpg');
+}

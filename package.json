@@ -1,0 +1,35 @@
+{
+  "name": "gard_game",
+  "version": "1.0.0",
+  "description": "project5",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode=production && NODE_ENV=production postcss ./src/main.css -o ./dist/dist.css",
+    "start": "webpack-cli serve --mode development",
+    "watch": "TAILWIND_MODE=watch postcss ./src/main.css -o ./dist/dist.css -w",
+    "format": "prettier --write \"src/**/*.{ts,js}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teradad41/Gard_Game.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Teradad41/Gard_Game/issues"
+  },
+  "homepage": "https://github.com/Teradad41/Gard_Game#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "cssnano": "^6.0.1",
+    "postcss": "^8.4.24",
+    "postcss-cli": "^10.1.0",
+    "prettier": "^2.8.8",
+    "tailwindcss": "^3.3.2",
+    "ts-loader": "^9.4.3",
+    "typescript": "^5.1.3",
+    "webpack": "^5.85.1",
+    "webpack-cli": "^5.1.3",
+    "webpack-dev-server": "^4.15.0"
+  }
+}
