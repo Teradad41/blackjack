@@ -8,11 +8,11 @@ export class Controller {
     StartView.render()
   }
 
-  public static renderCard(): void {
-    CardView.render(new Card('H', '4'))
-  }
-
   public static renderMainPage(): void {
     MainView.render()
+  }
+
+  public static renderCard(): void {
+    CardView.render(new Card('H', '4'))
   }
 }

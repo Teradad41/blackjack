@@ -6,7 +6,7 @@ export class StartView {
     if (STARTPAGE)
       STARTPAGE.innerHTML = `
         <div class="background-container flex items-center justify-center">
-            <form class="">
+            <form class="startGameForm">
                 <div class="mb-4">
                     <label class="block mb-2 font-bold text-white text-xl">NAME</label>
                     <input class="w-full px-3 py-2 border rounded-xl focus:outline-green-600 shadow-xl"
@@ -30,13 +30,12 @@ export class StartView {
                 </button>
             </form>
         </div>
-    `
-
-    const startBtn = STARTPAGE?.querySelectorAll('#startBtn')[0]
-    startBtn?.addEventListener('click', (e) => {
+      `
+    // Game Start
+    STARTPAGE?.querySelector('.startGameForm')!.addEventListener('submit', (e) => {
       e.preventDefault()
-      STARTPAGE!.classList.remove('block')
-      STARTPAGE!.classList.add('hidden')
+      STARTPAGE?.classList.remove('block')
+      STARTPAGE?.classList.add('hidden')
       Controller.renderMainPage()
     })
   }

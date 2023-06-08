@@ -31,7 +31,7 @@ export class MainView {
                         <div class="font-bold text-center pt-2">HIT</div>
                     </div>
                     <div class="flex flex-col items-center justify-center px-8" id="surrenderBtn">
-                        <button class="bg-gradient-to-br from-blue-500 to-blue-800 circle-button rounded-full hover:opacity-80">
+                        <button class="bg-gradient-to-br from-blue-500 to-blue-800 circle-button rounded-full hover:opacity-70">
                             <i class="fas fa-coins fa-2xl"></i>
                         </button>
                         <div class="font-bold text-center pt-2">DOUBLE</div>
