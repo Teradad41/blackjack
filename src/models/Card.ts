@@ -7,6 +7,10 @@ export class Card {
     this.rank = rank
   }
 
+  public getSuit(): string {
+    return this.suit
+  }
+
   public getRank(): string {
     return this.rank
   }
