@@ -33,6 +33,7 @@ export class Deck {
 
   public resetDeck(): void {
     this.deck = Deck.generateDeck()
+    this.shuffle()
   }
 
   public drawOne(): Card | undefined {

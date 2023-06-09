@@ -1,4 +1,5 @@
 import { STARTPAGE } from '../config'
+import { MainView } from './MainView'
 import { Controller } from '../controllers/Controllers'
 
 export class StartView {
@@ -12,7 +13,7 @@ export class StartView {
                     <input class="w-full px-3 py-2 border rounded-xl focus:outline-green-600 shadow-xl"
                         id="userName"
                         type="text"
-                        value="KYO TERADA"
+                        value="TERADAD"
                         placeholder="Name"
                         required
                     >
@@ -34,9 +35,11 @@ export class StartView {
     // Game Start
     STARTPAGE?.querySelector('.startGameForm')!.addEventListener('submit', (e) => {
       e.preventDefault()
-      STARTPAGE?.classList.remove('block')
-      STARTPAGE?.classList.add('hidden')
-      Controller.renderMainPage()
+      const userNameInput = STARTPAGE?.querySelector('#userName') as HTMLInputElement
+      const gameTypeInput = STARTPAGE?.querySelector('#gameType') as HTMLSelectElement
+
+      if (STARTPAGE) MainView.displayNone(STARTPAGE)
+      Controller.startBlackJack(userNameInput.value, gameTypeInput.value)
     })
   }
 }
