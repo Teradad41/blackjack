@@ -38,6 +38,10 @@ export class Player {
     return this.chips
   }
 
+  public setChips(chips: number): void {
+    this.chips = chips
+  }
+
   public getWinAmount(): number {
     return this.winAmount
   }
@@ -46,20 +50,30 @@ export class Player {
     return this.bet
   }
 
+  public setBet(bet: number): void {
+    this.bet = bet
+  }
+
   public getHand(): Card[] {
     return this.hand
   }
 
-  public setHand(cards: Card[]): void {
-    this.hand = cards
+  // 手持ち自体を置き換える
+  public setHand(hand: Card[]): void {
+    this.hand = hand
+  }
+
+  // 一枚だけを追加する
+  public addHand(card: Card): void {
+    this.hand.push(card)
+  }
+
+  public setGameStatus(status: string): void {
+    this.gameStatus = status
   }
 
   public clearHand(): void {
     this.hand = []
-  }
-
-  public setBet(bet: number): void {
-    this.bet = bet
   }
 
   public clearBet(): void {
@@ -67,8 +81,11 @@ export class Player {
   }
 
   // 状態を考慮した上で、プレイヤーが行った意思決定を返す
-  public promptPlayer(userData: number | null): GameDecision {
-    return new GameDecision('hit', 50)
+  public promptPlayer(): GameDecision {
+    const action: string = this.gameStatus
+    const amount: number = this.bet
+
+    return new GameDecision(action, amount)
   }
 
   // 合計が21を超える場合、手札の各Aを、合計が21以下になるまで10を引く

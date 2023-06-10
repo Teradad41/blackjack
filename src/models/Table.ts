@@ -49,6 +49,10 @@ export class Table {
     this.gamePhase = gamePhase
   }
 
+  public getDeck(): Deck {
+    return this.deck
+  }
+
   /*
     Player player : テーブルは、Player.promptPlayer()を使用してGameDecisionを取得し、GameDecisionとgameTypeに応じてPlayerの状態を更新します。
     return Null : このメソッドは、プレーヤの状態を更新するだけです。
@@ -57,9 +61,9 @@ export class Table {
   evaluateMove(player: Player): void {}
 
   /*
-        return String: 新しいターンが始まる直前の全プレイヤーの状態を表す文字列。
-        NOTE: このメソッドの出力は、各ラウンドの終了時にテーブルのresultsLogメンバを更新するために使用されます。
-    */
+    return String: 新しいターンが始まる直前の全プレイヤーの状態を表す文字列。
+    NOTE: このメソッドの出力は、各ラウンドの終了時にテーブルのresultsLogメンバを更新するために使用されます。
+  */
   blackjackEvaluateAndGetRoundResults(): string {
     return ''
   }
@@ -97,14 +101,14 @@ export class Table {
   }
 
   /*
-       Number userData: テーブルモデルの外部から渡されるデータです。 
-       return null: このメソッドはテーブルの状態を更新するだけで、値を返しません。
-    */
+    Number userData: テーブルモデルの外部から渡されるデータです。 
+    return null: このメソッドはテーブルの状態を更新するだけで、値を返しません。
+  */
   public haveTurn(userData: number): void {
     if (this.gamePhase === 'roundOver') return
     const currentPlayer: Player = this.getTurnPlayer()
-    // プレイヤーに行動を促す。 userDataはとりあえず 1
-    currentPlayer.promptPlayer(1)
+    // プレイヤーに行動を促す
+    currentPlayer.promptPlayer()
     this.turnCorner++
   }
 

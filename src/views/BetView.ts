@@ -1,6 +1,7 @@
 import { Controller } from '../controllers/Controllers'
 import { MAINFIELD } from '../config'
 import { Table } from '../models/Table'
+import { MainView } from './MainView'
 
 export class BetView {
   public static render(table: Table): void {
@@ -71,9 +72,8 @@ export class BetView {
             `
 
       const betAmountDiv: HTMLElement | null = betOrActionDiv.querySelector('#userBetAmount') as HTMLElement
-      const betChips: Element[] = [...betOrActionDiv.querySelectorAll('.chip')]
-      const onDBetChipsDiv: HTMLElement | null = MAINFIELD.querySelector('#onBetChips') as HTMLElement
       const ownChipsDiv: HTMLElement | null = MAINFIELD.querySelector('#ownChips') as HTMLElement
+      const betChips: Element[] = [...betOrActionDiv.querySelectorAll('.chip')]
 
       // チップ額の追加
       for (const chip of betChips) {
@@ -95,12 +95,14 @@ export class BetView {
 
       // Dealボタン
       betOrActionDiv.querySelector('#dealBtn')?.addEventListener('click', () => {
-        if (betAmountDiv !== null && betAmountDiv.innerHTML !== '0') {
-          Controller.actingPhase(table, betOrActionDiv)
-          onDBetChipsDiv.innerHTML = betAmountDiv.innerHTML
-        }
-        ownChipsDiv.innerHTML = (parseInt(ownChipsDiv.innerHTML) - parseInt(betAmountDiv.innerHTML)).toString()
-        betAmountDiv.innerHTML = '0'
+        const betAmount: number = parseInt(betAmountDiv.innerHTML, 10)
+        const ownChips: number = parseInt(ownChipsDiv.innerHTML, 10) - betAmount
+
+        if (betAmount === 0) return
+
+        Controller.actingPhase(table, betOrActionDiv)
+        MainView.setPlayerBetAmount(table, betAmount)
+        MainView.setPlayerOwnChips(table, ownChips)
       })
     }
   }

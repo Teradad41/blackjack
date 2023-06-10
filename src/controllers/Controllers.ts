@@ -33,14 +33,15 @@ export class Controller {
   }
 
   public static actingPhase(table: Table, betOrActionDiv: HTMLElement): void {
-    ActionView.render(betOrActionDiv)
-    table.setGamePhase('acting')
-
     // カードを表向きにする
     setTimeout(() => {
       CardView.rotateCards('houseCardDiv')
       CardView.rotateCards('userCardDiv')
-      MainView.setScore(table)
+      MainView.setScore(table, 'initial')
     }, 400)
+
+    table.setGamePhase('acting')
+    ActionView.render(table, betOrActionDiv)
+    if (table.allPlayerActionsResolved()) console.log('!')
   }
 }

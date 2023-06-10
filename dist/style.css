@@ -1,3 +1,13 @@
+.value-circle {
+  height: 2rem;
+  width: 2rem;
+}
+
+.action-button {
+  height: 4.2rem:
+  width: 4.2rem;
+}
+
 .card {
     perspective: 1000px;
 }

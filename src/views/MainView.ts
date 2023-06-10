@@ -1,5 +1,6 @@
 import { MAINFIELD } from '../config'
 import { Table } from '../models/Table'
+import { STATUSCOLOR } from '../config'
 
 export class MainView {
   public static render(table: Table): void {
@@ -20,7 +21,7 @@ export class MainView {
             <div id="playersDiv" class="flex justify-center pt-[3.2rem]">
               <div id="userDiv" class="flex flex-col items-center">
                 <p class="text-center text-yellow-300 text-3xl">${table.getPlayers()[0].getName()}</p>
-                <div class="text-center text-white flex p-1 justify-between">
+                <div id="playerChipDiv" class="text-center text-white flex p-1 justify-between">
                   <p class="rem1 px-2 text-left">BET: <span id="onBetChips" class="text-xl">${table
                     .getPlayers()[0]
                     .getBet()}</span></p>
@@ -33,12 +34,11 @@ export class MainView {
                     <p id="playerScore" class="text-black mb-1 font-bold text-xl">0</p>
                   </button>
                 </div>
-                <div class="flex justify-center py-1">
-                  <button id="statusField" class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
+                <div id="statusDiv" class="flex justify-center py-1">
+                  <button class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
                     WAITING
                   </button>
                 </div>
-
                 <div id="userCardDiv" class="flex justify-center pt-5"></div>
                 <div id="betOrActionDiv"></div>
               </div>
@@ -50,16 +50,50 @@ export class MainView {
   }
 
   public static setPlayerStatus(status: string): void {
-    const playerStatusDiv = MAINFIELD?.querySelector('#statusField') as HTMLElement
-    playerStatusDiv.innerHTML = status
+    if (!MAINFIELD) return
+
+    const playerStatusDiv = MAINFIELD.querySelector('#statusDiv') as HTMLElement
+    if (!playerStatusDiv) return
+
+    const color = STATUSCOLOR[status] || 'bg-gray-600'
+    playerStatusDiv.innerHTML = `
+      <button class="${color} rounded-lg w-40 py-1 cursor-default" disabled>
+        ${status}
+      </button>
+      `
   }
 
-  public static setScore(table: Table): void {
+  public static setScore(table: Table, status: string = 'notInitial'): void {
     const houseScoreDiv = MAINFIELD?.querySelector('#houseScore') as HTMLElement
     const playerScoreDiv = MAINFIELD?.querySelector('#playerScore') as HTMLElement
 
-    houseScoreDiv.innerHTML = table.getHouse().getHand()[0].getRankNumber().toString()
-    playerScoreDiv.innerHTML = table.getPlayers()[0].getHandScore().toString()
+    const houseScore =
+      status === 'initial'
+        ? table.getHouse().getHand()[0].getRankNumber().toString()
+        : table.getHouse().getHandScore().toString()
+
+    const playerScore = table.getPlayers()[0].getHandScore().toString()
+
+    if (houseScoreDiv && playerScoreDiv) {
+      houseScoreDiv.innerHTML = houseScore
+      playerScoreDiv.innerHTML = playerScore
+    }
+  }
+
+  // ベット額を更新する
+  public static setPlayerBetAmount(table: Table, betAmount: number): void {
+    const playerOnBetDiv = MAINFIELD?.querySelector('#onBetChips') as HTMLElement
+
+    if (playerOnBetDiv !== null) playerOnBetDiv.innerHTML = betAmount.toString()
+    table.getPlayers()[0].setBet(betAmount)
+  }
+
+  // 保有しているチップ額を更新する
+  public static setPlayerOwnChips(table: Table, ownChipAmount: number): void {
+    const playerOwnChipsDiv = MAINFIELD?.querySelector('#ownChips') as HTMLElement
+
+    if (playerOwnChipsDiv !== null) playerOwnChipsDiv.innerHTML = ownChipAmount.toString()
+    table.getPlayers()[0].setChips(ownChipAmount)
   }
 
   public static displayNone(ele: HTMLElement): void {
