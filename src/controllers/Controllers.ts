@@ -1,30 +1,46 @@
-import { Card } from '../models/Card'
 import { StartView } from '../views/StartView'
 import { CardView } from '../views/CardView'
 import { MainView } from '../views/MainView'
-import { BetView } from '..//views/BetView'
+import { BetView } from '../views/BetView'
+import { ActionView } from '../views/ActionView'
 import { MAINFIELD } from '../config'
 import { Table } from '../models/Table'
+import { Player } from '../models/Player'
 
 export class Controller {
   public static renderStartPage(): void {
     StartView.render()
   }
 
-  public static startBlackJack(userName: string, gameType: string): void {
-    MainView.render(userName, gameType)
+  public static startBlackJack(player: Player): void {
+    const table: Table = new Table(player.getGameType())
+    table.setPlayers([player])
 
-    const table: Table = new Table(gameType)
-
-    // ここに追加する
+    MainView.render(table)
     const houseCardDiv = MAINFIELD?.querySelector('#houseCardDiv') as HTMLElement
-    houseCardDiv.innerHTML += CardView.render(new Card('C', '9'))
-    houseCardDiv.innerHTML += CardView.renderCardReverse()
-
     const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-    playerCardDiv.innerHTML += CardView.render(new Card('C', '9'))
-    playerCardDiv.innerHTML += CardView.render(new Card('H', 'J'))
+    table.blackjackAssignPlayerHands()
 
-    BetView.render()
+    houseCardDiv.innerHTML += CardView.renderCard(table.getHouse().getHand()[0])
+    houseCardDiv.innerHTML += CardView.renderCard(table.getHouse().getHand()[1])
+
+    for (const player of table.getPlayers()) {
+      playerCardDiv.innerHTML += CardView.renderCard(table.getPlayers()[0].getHand()[0])
+      playerCardDiv.innerHTML += CardView.renderCard(table.getPlayers()[0].getHand()[1])
+    }
+
+    BetView.render(table)
+  }
+
+  public static actingPhase(table: Table, betOrActionDiv: HTMLElement): void {
+    ActionView.render(betOrActionDiv)
+    table.setGamePhase('acting')
+
+    // カードを表向きにする
+    setTimeout(() => {
+      CardView.rotateCards('houseCardDiv')
+      CardView.rotateCards('userCardDiv')
+      MainView.setScore(table)
+    }, 400)
   }
 }

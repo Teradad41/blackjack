@@ -1,41 +1,62 @@
+import { Controller } from '../controllers/Controllers'
 import { MAINFIELD } from '../config'
-import { ActionView } from './ActionView'
+import { Table } from '../models/Table'
 
 export class BetView {
-  public static render(): void {
+  public static render(table: Table): void {
     if (MAINFIELD) {
       const betOrActionDiv: HTMLElement = MAINFIELD.querySelector('#betOrActionDiv') as HTMLElement
+      betOrActionDiv.innerHTML = ''
       betOrActionDiv.innerHTML = `
             <div class="flex flex-col justify-center items-center mt-7 px-7 py-4" style="box-shadow: 0px -8px 10px rgba(0, 228, 0), 0px 8px 10px rgba(0, 228, 0);">
                 <div class="flex justify-center">
-                    <p class="px-5 text-3xl pb-1">BET: <span id="userBetAmount" class="text-4xl">0</span></p>
+                    <p class="px-5 text-3xl pb-1">BET: <span id="userBetAmount" class="text-4xl">${table
+                      .getPlayers()[0]
+                      .getBet()
+                      .toString()}</span></p>
                 </div>
                 <div class="flex justify-around py-6">
                     <div class="px-2">
-                        <div class="chip w-16 h-16 bg-red-500 rounded-full shadow-xl flex justify-center items-center cursor-pointer" data-chips="5">
+                        <div class="chip w-16 h-16 bg-red-500 rounded-full shadow-xl flex justify-center items-center cursor-pointer hover:opacity-80" data-chips="${table
+                          .getBetDenomation()[0]
+                          .toString()}">
                         <div class="w-12 h-12 bg-white rounded-full flex justify-center items-center">
-                            <p class="text-gray-800 text-lg font-bold pb-1">$5</p>
+                            <p class="text-gray-800 text-lg font-bold pb-1">\$${table
+                              .getBetDenomation()[0]
+                              .toString()}</p>
                         </div>
                     </div>
                 </div>
                 <div class="px-2">
-                    <div class="chip w-16 h-16 bg-green-500 rounded-full shadow-xl flex justify-center items-center cursor-pointer" data-chips="20">
+                    <div class="chip w-16 h-16 bg-green-500 rounded-full shadow-xl flex justify-center items-center cursor-pointer hover:opacity-80" data-chips="${table
+                      .getBetDenomation()[1]
+                      .toString()}">
                         <div class="w-12 h-12 bg-white rounded-full flex justify-center items-center">
-                            <p class="text-gray-800 text-lg font-bold pb-1">$20</p>
+                            <p class="text-gray-800 text-lg font-bold pb-1">\$${table
+                              .getBetDenomation()[1]
+                              .toString()}</p>
                         </div>
                     </div>
                 </div>
                 <div class="px-2">
-                    <div class="chip w-16 h-16 bg-blue-700 rounded-full shadow-xl flex justify-center items-center cursor-pointer" data-chips="50">
+                    <div class="chip w-16 h-16 bg-blue-700 rounded-full shadow-xl flex justify-center items-center cursor-pointer hover:opacity-80" data-chips="${table
+                      .getBetDenomation()[2]
+                      .toString()}">
                         <div class="w-12 h-12 bg-white rounded-full flex justify-center items-center">
-                            <p class="text-gray-800 text-lg font-bold pb-1">$50</p>
+                            <p class="text-gray-800 text-lg font-bold pb-1">\$${table
+                              .getBetDenomation()[2]
+                              .toString()}</p>
                         </div>
                     </div> 
                 </div>
                 <div class="px-2">
-                    <div class="chip w-16 h-16 bg-gray-800 rounded-full shadow-xl flex justify-center items-center cursor-pointer" data-chips="100">
+                    <div class="chip w-16 h-16 bg-gray-800 rounded-full shadow-xl flex justify-center items-center cursor-pointer hover:opacity-80" data-chips="${table
+                      .getBetDenomation()[3]
+                      .toString()}">
                         <div class="w-12 h-12 bg-white rounded-full flex justify-center items-center">
-                            <p class="text-gray-800 text-lg font-bold pb-1">$100</p>
+                            <p class="text-gray-800 text-lg font-bold pb-1">\$${table
+                              .getBetDenomation()[3]
+                              .toString()}</p>
                         </div>
                     </div>
                 </div>
@@ -50,26 +71,36 @@ export class BetView {
             `
 
       const betAmountDiv: HTMLElement | null = betOrActionDiv.querySelector('#userBetAmount') as HTMLElement
-      const betChips = betOrActionDiv.querySelectorAll('.chip')
+      const betChips: Element[] = [...betOrActionDiv.querySelectorAll('.chip')]
+      const onDBetChipsDiv: HTMLElement | null = MAINFIELD.querySelector('#onBetChips') as HTMLElement
+      const ownChipsDiv: HTMLElement | null = MAINFIELD.querySelector('#ownChips') as HTMLElement
 
+      // チップ額の追加
       for (const chip of betChips) {
         chip.addEventListener('click', () => {
           const currentChip: number = parseInt(betAmountDiv?.innerHTML || '0', 10)
           const chipValue: string | null = chip.getAttribute('data-chips')
 
           if (chipValue !== null) {
-            const addedChip: number = parseInt(chipValue, 10)
-            betAmountDiv.innerHTML = (currentChip + addedChip).toString()
+            const totalChip: number = currentChip + parseInt(chipValue, 10)
+            if (totalChip <= table.getPlayers()[0].getChips()) betAmountDiv.innerHTML = totalChip.toString()
           }
         })
       }
 
+      // Clearボタン
       betOrActionDiv.querySelector('#clearBtn')?.addEventListener('click', () => {
-        betAmountDiv.innerHTML = '0'
+        if (betAmountDiv !== null) betAmountDiv.innerHTML = '0'
       })
 
+      // Dealボタン
       betOrActionDiv.querySelector('#dealBtn')?.addEventListener('click', () => {
-        if (betAmountDiv.innerHTML !== '0') ActionView.render(betOrActionDiv)
+        if (betAmountDiv !== null && betAmountDiv.innerHTML !== '0') {
+          Controller.actingPhase(table, betOrActionDiv)
+          onDBetChipsDiv.innerHTML = betAmountDiv.innerHTML
+        }
+        ownChipsDiv.innerHTML = (parseInt(ownChipsDiv.innerHTML) - parseInt(betAmountDiv.innerHTML)).toString()
+        betAmountDiv.innerHTML = '0'
       })
     }
   }

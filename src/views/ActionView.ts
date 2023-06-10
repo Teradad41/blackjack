@@ -2,7 +2,7 @@ export class ActionView {
   public static render(betOrActionDiv: HTMLElement): void {
     betOrActionDiv.innerHTML = ''
     betOrActionDiv.innerHTML = `
-        <div class="flex justify-around items-center pt-11">
+        <div class="flex justify-around items-center pt-[3rem]">
         <div id="surrenderBtn" class="flex flex-col items-center justify-center px-8">
             <button class="bg-gradient-to-br from-red-500 to-red-800 circle-button rounded-full hover:opacity-80">
                 <i class="fas fa-flag fa-2xl"></i>

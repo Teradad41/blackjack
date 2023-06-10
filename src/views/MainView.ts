@@ -1,7 +1,8 @@
 import { MAINFIELD } from '../config'
+import { Table } from '../models/Table'
 
 export class MainView {
-  public static render(userName: string, gameType: string): void {
+  public static render(table: Table): void {
     if (MAINFIELD) {
       MainView.displayBlock(MAINFIELD)
       MAINFIELD.innerHTML = `
@@ -18,19 +19,23 @@ export class MainView {
 
             <div id="playersDiv" class="flex justify-center pt-[3.2rem]">
               <div id="userDiv" class="flex flex-col items-center">
-                <p class="text-center text-yellow-300 text-3xl">${userName}</p>
+                <p class="text-center text-yellow-300 text-3xl">${table.getPlayers()[0].getName()}</p>
                 <div class="text-center text-white flex p-1 justify-between">
-                  <p class="rem1 px-2 text-left">BET: <span class="text-xl">0</span></p>
-                  <p class="rem1 px-2 text-left">CHIP: <span class="text-xl">400</span></p>
+                  <p class="rem1 px-2 text-left">BET: <span id="onBetChips" class="text-xl">${table
+                    .getPlayers()[0]
+                    .getBet()}</span></p>
+                  <p class="rem1 px-2 text-left">CHIP: <span id="ownChips" class="text-xl">${table
+                    .getPlayers()[0]
+                    .getChips()}</span></p>
                 </div>
                 <div class="flex justify-center py-2">
                   <button class="bg-white value-circle rounded-full cursor-default" disabled>
-                    <p id="userScore" class="text-black mb-1 font-bold text-xl">0</p>
+                    <p id="playerScore" class="text-black mb-1 font-bold text-xl">0</p>
                   </button>
                 </div>
                 <div class="flex justify-center py-1">
-                  <button class="bg-gray-500 rounded-lg w-40 py-1 cursor-default" disabled>
-                    <p class="">WAITING</p>
+                  <button id="statusField" class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
+                    WAITING
                   </button>
                 </div>
 
@@ -42,6 +47,19 @@ export class MainView {
         </div>  
       `
     }
+  }
+
+  public static setPlayerStatus(status: string): void {
+    const playerStatusDiv = MAINFIELD?.querySelector('#statusField') as HTMLElement
+    playerStatusDiv.innerHTML = status
+  }
+
+  public static setScore(table: Table): void {
+    const houseScoreDiv = MAINFIELD?.querySelector('#houseScore') as HTMLElement
+    const playerScoreDiv = MAINFIELD?.querySelector('#playerScore') as HTMLElement
+
+    houseScoreDiv.innerHTML = table.getHouse().getHand()[0].getRankNumber().toString()
+    playerScoreDiv.innerHTML = table.getPlayers()[0].getHandScore().toString()
   }
 
   public static displayNone(ele: HTMLElement): void {

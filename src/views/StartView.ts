@@ -1,6 +1,7 @@
 import { STARTPAGE } from '../config'
 import { MainView } from './MainView'
 import { Controller } from '../controllers/Controllers'
+import { Player } from '../models/Player'
 
 export class StartView {
   public static render(): void {
@@ -39,7 +40,7 @@ export class StartView {
       const gameTypeInput = STARTPAGE?.querySelector('#gameType') as HTMLSelectElement
 
       if (STARTPAGE) MainView.displayNone(STARTPAGE)
-      Controller.startBlackJack(userNameInput.value, gameTypeInput.value)
+      Controller.startBlackJack(new Player(userNameInput.value, 'user', gameTypeInput.value))
     })
   }
 }

@@ -22,8 +22,32 @@ export class Player {
     this.gameStatus = 'betting'
   }
 
+  public getName(): string {
+    return this.name
+  }
+
   public getGameStatus(): string {
     return this.gameStatus
+  }
+
+  public getGameType(): string {
+    return this.gameType
+  }
+
+  public getChips(): number {
+    return this.chips
+  }
+
+  public getWinAmount(): number {
+    return this.winAmount
+  }
+
+  public getBet(): number {
+    return this.bet
+  }
+
+  public getHand(): Card[] {
+    return this.hand
   }
 
   public setHand(cards: Card[]): void {

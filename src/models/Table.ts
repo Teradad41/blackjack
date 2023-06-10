@@ -21,20 +21,39 @@ export class Table {
     this.turnCorner = 0
     this.resultsLog = []
 
-    this.players = [
-      new Player('ai1', 'ai', this.gameType),
-      new Player('ai2', 'ai', this.gameType),
-      new Player('ai3', 'ai', this.gameType),
-    ]
-
+    this.players = []
     this.house = new Player('house', 'house', this.gameType)
   }
 
+  public getPlayers(): Player[] {
+    return this.players
+  }
+
+  public setPlayers(players: Player[]): void {
+    this.players = players
+  }
+
+  public getHouse(): Player {
+    return this.house
+  }
+
+  public getBetDenomation(): number[] {
+    return this.betDenomination
+  }
+
+  public getGamePhase(): string {
+    return this.gamePhase
+  }
+
+  public setGamePhase(gamePhase: string): void {
+    this.gamePhase = gamePhase
+  }
+
   /*
-        Player player : テーブルは、Player.promptPlayer()を使用してGameDecisionを取得し、GameDecisionとgameTypeに応じてPlayerの状態を更新します。
-        return Null : このメソッドは、プレーヤの状態を更新するだけです。
-        例.プレイヤーが「ヒット」し、手札が21以上の場合、gameStatusを「バスト」に設定し、チップからベットを引きます。
-    */
+    Player player : テーブルは、Player.promptPlayer()を使用してGameDecisionを取得し、GameDecisionとgameTypeに応じてPlayerの状態を更新します。
+    return Null : このメソッドは、プレーヤの状態を更新するだけです。
+    例.プレイヤーが「ヒット」し、手札が21以上の場合、gameStatusを「バスト」に設定し、チップからベットを引きます。
+  */
   evaluateMove(player: Player): void {}
 
   /*
@@ -50,6 +69,9 @@ export class Table {
       const hand: Card[] | undefined = this.checkNotUndefinedAndGetTwo()
       if (hand !== undefined) player.setHand(hand)
     }
+
+    const houseHand: Card[] | undefined = this.checkNotUndefinedAndGetTwo()
+    if (houseHand !== undefined) this.house.setHand(houseHand)
   }
 
   private checkNotUndefinedAndGetTwo(): Card[] | undefined {
