@@ -98,17 +98,17 @@ export class BetView {
     })
   }
 
-  // テーブルでの現在のプレイヤーを強調する
+  // 現在のプレイヤーを強調する
   public static setTurnColor(onTurn: string, outOfTurn: string): void {
     const onturnPlayerDiv = MAINFIELD?.querySelector(`#${onTurn}`) as HTMLElement
     const outOfTurnPlayerDiv = MAINFIELD?.querySelector(`#${outOfTurn}`) as HTMLElement
 
     if (onturnPlayerDiv !== null) {
-      onturnPlayerDiv.classList.remove('text-yellow-300')
-      onturnPlayerDiv.classList.add('text-red-500')
+      onturnPlayerDiv.classList.remove('text-red-600')
+      onturnPlayerDiv.classList.add('text-yellow-300')
 
-      outOfTurnPlayerDiv.classList.remove('text-red-500')
-      outOfTurnPlayerDiv.classList.add('text-yellow-300')
+      outOfTurnPlayerDiv.classList.remove('text-yellow-300')
+      outOfTurnPlayerDiv.classList.add('text-red-600')
     }
   }
 }

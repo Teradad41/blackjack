@@ -58,12 +58,8 @@ export class Table {
     return Null : このメソッドは、プレーヤの状態を更新するだけです。
     例.プレイヤーが「ヒット」し、手札が21以上の場合、gameStatusを「バスト」に設定し、チップからベットを引きます。
   */
-  evaluateMove(player: Player): void {
-    if (player.getChips() <= 0) player.setGameStatus('broken')
-    if (player.getHandScore() > 21) {
-      player.setGameStatus('bust')
-      player.setChips(player.getChips() - player.getBet())
-    }
+  public evaluateTable(table: Table): void {
+    // if ()
   }
 
   /*
@@ -113,7 +109,6 @@ export class Table {
   public haveTurn(userData: number): void {
     if (this.gamePhase === 'roundOver') return
     const currentPlayer: Player = this.getTurnPlayer()
-    // プレイヤーに行動を促す
     currentPlayer.promptPlayer()
     this.turnCorner++
   }
@@ -126,7 +121,6 @@ export class Table {
     return this.turnCorner % this.players.length === 2
   }
 
-  // acting フェーズを終了させるために使う
   allPlayerActionsResolved(): boolean {
     const resolvedPlayers = this.players.filter((player: Player) => {
       const status: string = player.getGameStatus().toLowerCase()
@@ -135,7 +129,8 @@ export class Table {
         status === 'stand' ||
         status === 'bust' ||
         status === 'surrender' ||
-        status === 'blackjack'
+        status === 'blackjack' ||
+        status === 'double'
       )
     })
     return resolvedPlayers.length === this.players.length

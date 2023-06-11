@@ -9,19 +9,23 @@ export class MainView {
       MainView.displayBlock(MAINFIELD)
       MAINFIELD.innerHTML = `
         <div class="h-screen flex justify-center" style="background: #1D4434; color: white;">            
-          <div class="container pt-10">
-            <p id="house" class="text-center text-yellow-300 text-3xl">House</p>
+          <div class="container pt-6">
+            <p id="house" class="text-center text-red-600 text-3xl">House</p>
             <div class="flex justify-center py-2">
               <button class="bg-white value-circle rounded-full cursor-default" disabled>
                 <p id="houseScore" class="text-black mb-1 font-bold text-xl">0</p>
               </button>
             </div>
+            <div id="houseStatusDiv" class="flex justify-center pt-1 pb-2">
+              <button class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
+                WAITING
+              </button>
+            </div>
+            <div id="houseCardDiv" class="flex justify-center py-2"></div>
 
-            <div id="houseCardDiv" class="flex justify-center py-3"></div>
-
-            <div id="playersDiv" class="flex justify-center pt-[3.2rem]">
+            <div id="playersDiv" class="flex justify-center pt-7">
               <div id="userDiv" class="flex flex-col items-center">
-                <p id="player" class="text-center text-yellow-300 text-3xl">${table.getPlayers()[0].getName()}</p>
+                <p id="player" class="text-center text-red-600 text-3xl">${table.getPlayers()[0].getName()}</p>
                 <div id="playerChipDiv" class="text-center text-white flex p-1 justify-between">
                   <p class="rem1 px-2 text-left">BET: <span id="onBetChips" class="text-xl">${table
                     .getPlayers()[0]
@@ -35,12 +39,12 @@ export class MainView {
                     <p id="playerScore" class="text-black mb-1 font-bold text-xl">0</p>
                   </button>
                 </div>
-                <div id="statusDiv" class="flex justify-center py-1">
+                <div id="playerStatusDiv" class="flex justify-center py-1">
                   <button class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
                     WAITING
                   </button>
                 </div>
-                <div id="userCardDiv" class="flex justify-center pt-5"></div>
+                <div id="userCardDiv" class="flex justify-center pt-4"></div>
                 <div id="betOrActionDiv"></div>
               </div>
             </div>
@@ -50,21 +54,43 @@ export class MainView {
     }
   }
 
-  public static setPlayerStatus(status: string): void {
+  // ステータスバーを更新する
+  public static setStatusField(status: string, type: string): void {
     if (!MAINFIELD) return
 
-    const playerStatusDiv = MAINFIELD.querySelector('#statusDiv') as HTMLElement
-    if (!playerStatusDiv) return
+    const houseOrPlayer: string = type === 'house' ? 'houseStatusDiv' : 'playerStatusDiv'
+    const statusDiv = MAINFIELD.querySelector(`#${houseOrPlayer}`) as HTMLElement
+    if (!statusDiv) return
 
     const color = STATUSCOLOR[status] || 'bg-gray-600'
-    playerStatusDiv.innerHTML = `
+    statusDiv.innerHTML = `
       <button class="${color} rounded-lg w-40 py-1 cursor-default" disabled>
         ${status}
       </button>
       `
   }
 
-  public static setScore(table: Table, status: string = 'notInitial'): void {
+  public static setHouseScore(table: Table, status: string = 'notInitial'): void {
+    const houseScoreDiv = MAINFIELD?.querySelector('#houseScore') as HTMLElement
+
+    const houseScore =
+      status === 'initial'
+        ? table.getHouse().getHand()[0].getRankNumber().toString()
+        : table.getHouse().getHandScore().toString()
+
+    if (houseScoreDiv) {
+      houseScoreDiv.innerHTML = houseScore
+    }
+  }
+
+  public static setPlayerScore(table: Table): void {
+    const playerScoreDiv = MAINFIELD?.querySelector('#playerScore') as HTMLElement
+    const playerScore = table.getPlayers()[0].getHandScore().toString()
+
+    if (playerScoreDiv) playerScoreDiv.innerHTML = playerScore
+  }
+
+  public static(table: Table, status: string = 'notInitial'): void {
     const houseScoreDiv = MAINFIELD?.querySelector('#houseScore') as HTMLElement
     const playerScoreDiv = MAINFIELD?.querySelector('#playerScore') as HTMLElement
 

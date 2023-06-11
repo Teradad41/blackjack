@@ -3,7 +3,7 @@ import { CardView } from '../views/CardView'
 import { MainView } from '../views/MainView'
 import { BetView } from '../views/BetView'
 import { ActionView } from '../views/ActionView'
-import { MAINFIELD } from '../config'
+import { DELAY, MAINFIELD } from '../config'
 import { Table } from '../models/Table'
 import { Player } from '../models/Player'
 
@@ -34,31 +34,48 @@ export class Controller {
   }
 
   // acting フェーズ
-  public static actingPhase(table: Table, betOrActionDiv: HTMLElement): void {
+  public static async actingPhase(table: Table, betOrActionDiv: HTMLElement): Promise<void> {
     table.setGamePhase('acting')
-    MainView.setPlayerStatus('ON TURN')
+    MainView.setStatusField('ON TURN', 'player')
     ActionView.render(table, betOrActionDiv)
     BetView.setTurnColor('player', 'house')
 
-    // カードを表向きにする
-    setTimeout(() => {
-      CardView.rotateCards('houseCardDiv', 'initial')
-      CardView.rotateCards('userCardDiv')
-      MainView.setScore(table, 'initial')
-    }, 400)
+    await DELAY(500)
+    CardView.rotateCards('houseCardDiv', 'initial')
+    CardView.rotateCards('userCardDiv')
+    MainView.setHouseScore(table, 'initial')
+    MainView.setPlayerScore(table)
   }
 
   // evaluating フェーズ
-  public static evaluatingPhase(table: Table) {
+  public static async evaluatingPhase(table: Table): Promise<void> {
+    await DELAY(700)
     BetView.setTurnColor('house', 'player')
-
-    setTimeout(() => {
-      CardView.rotateCards('houseCardDiv')
-      MainView.setScore(table)
-    }, 1500)
+    MainView.setStatusField('ON TURN', 'house')
+    await DELAY(1000)
+    CardView.rotateCards('houseCardDiv')
+    MainView.setHouseScore(table)
 
     const house: Player = table.getHouse()
-    const houseScore: number = house.getHandScore()
     const houseCardDiv = MAINFIELD?.querySelector('#houseCardDiv') as HTMLElement
+
+    await DELAY(1000)
+    while (house.getHandScore() < 17) {
+      await DELAY(700)
+      await ActionView.handleNewCard(house, table, houseCardDiv)
+      MainView.setStatusField('HIT', 'house')
+      await DELAY(500)
+      CardView.rotateCards('houseCardDiv')
+      await DELAY(1000)
+      MainView.setHouseScore(table)
+    }
+
+    const houseStatus = () => {
+      if (house.getHandScore() === 21 && house.getHand().length === 2) return 'blackjack'
+      else if (house.getHandScore() >= 17) return 'stand'
+      else return 'bust'
+    }
+    MainView.setStatusField(houseStatus().toUpperCase(), 'house')
+    house.setGameStatus(houseStatus())
   }
 }
