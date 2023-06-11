@@ -88,6 +88,11 @@ export class Player {
     return new GameDecision(action, amount)
   }
 
+  public isBlackJack(): boolean {
+    if (this.getHandScore() === 21 && this.hand.length === 2) return true
+    else return false
+  }
+
   // 合計が21を超える場合、手札の各Aを、合計が21以下になるまで10を引く
   public getHandScore(): number {
     let handScore: number = 0

@@ -4,36 +4,38 @@ import { MAINFIELD } from '../config'
 import { CardView } from '../views/CardView'
 import { Card } from 'models/Card'
 import { DELAY } from '../config'
+import { Player } from 'models/Player'
+import { Controller } from '../controllers/Controllers'
 
 export class ActionView {
   public static render(table: Table, betOrActionDiv: HTMLElement): void {
-    betOrActionDiv.innerHTML = ''
+    const player = table.getPlayers()[0]
     betOrActionDiv.innerHTML = `
         <div class="flex justify-around items-center pt-[3rem]">
-        <div class="flex flex-col items-center justify-center px-6">
-            <button id="surrenderBtn" class="btn bg-gradient-to-br from-red-500 to-red-800 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-80">
-                <i class="fas fa-flag fa-2xl"></i>
-            </button>
-            <div class="font-bold text-center pt-2">SURRENDER</div>
-        </div>
-        <div class="flex flex-col items-center justify-center px-8">
-            <button id="standBtn" class="btn bg-gradient-to-br from-green-600 to-green-800 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-80">
-                <i class="fas fa-hand fa-2xl"></i>
-            </button>
-            <div class="font-bold text-center pt-2">STAND</div>
-        </div>
-        <div class="flex flex-col items-center justify-center px-8">
-            <button id="hitBtn" class="btn bg-gradient-to-br from-yellow-300 to-yellow-500 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-80">
-                <i class="fa-solid fa-copy fa-2xl"></i>
-            </button>
-            <div class="font-bold text-center pt-2">HIT</div>
-        </div>
-        <div class="flex flex-col items-center justify-center px-8">
-            <button id="doubleBtn" class="btn bg-gradient-to-br from-blue-500 to-blue-800 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-70">
-                <i class="fas fa-coins fa-2xl"></i>
-            </button>
-            <div class="font-bold text-center pt-2">DOUBLE</div>
-        </div>
+            <div class="flex flex-col items-center justify-center px-6">
+                <button id="surrenderBtn" class="btn bg-gradient-to-br from-red-500 to-red-800 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-80">
+                    <i class="fas fa-flag fa-2xl"></i>
+                </button>
+                <div class="font-bold text-center pt-2">SURRENDER</div>
+            </div>
+            <div class="flex flex-col items-center justify-center px-8">
+                <button id="standBtn" class="btn btn-sp bg-gradient-to-br from-green-600 to-green-800 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-80">
+                    <i class="fas fa-hand fa-2xl"></i>
+                </button>
+                <div class="font-bold text-center pt-2">STAND</div>
+            </div>
+            <div class="flex flex-col items-center justify-center px-8">
+                <button id="hitBtn" class="btn btn-sp bg-gradient-to-br from-yellow-300 to-yellow-500 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-80">
+                    <i class="fa-solid fa-copy fa-2xl"></i>
+                </button>
+                <div class="font-bold text-center pt-2">HIT</div>
+            </div>
+            <div class="flex flex-col items-center justify-center px-8">
+                <button id="doubleBtn" class="btn bg-gradient-to-br from-blue-500 to-blue-800 h-[4.5rem] w-[4.5rem] rounded-full hover:opacity-70">
+                    <i class="fas fa-coins fa-2xl"></i>
+                </button>
+                <div class="font-bold text-center pt-2">DOUBLE</div>
+            </div>
         </div>
         `
     const actions = [
@@ -43,58 +45,79 @@ export class ActionView {
       { selector: '#doubleBtn', status: 'DOUBLE' },
     ]
 
+    if (table.getPlayers()[0].isBlackJack()) {
+      MainView.setPlayerStatus('BLACKJACK')
+      player.setGameStatus('blackjack')
+
+      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
+    }
+
     // Surrender ボタン
-    betOrActionDiv.querySelector('#surrenderBtn')?.addEventListener('click', async () => {
+    betOrActionDiv.querySelector('#surrenderBtn')?.addEventListener('click', () => {
       MainView.setPlayerStatus('SURRENDER')
-      table.getPlayers()[0].setGameStatus('surrender')
+      player.setGameStatus('surrender')
+
+      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
     })
 
     // STAND ボタン
     betOrActionDiv.querySelector('#standBtn')?.addEventListener('click', () => {
       MainView.setPlayerStatus('STAND')
-      table.getPlayers()[0].setGameStatus('stand')
+      player.setGameStatus('stand')
+
+      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
     })
 
     // Hit ボタン
     betOrActionDiv.querySelector('#hitBtn')?.addEventListener('click', async () => {
       const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-      const newCard: Card | undefined = table.getDeck().drawOne()
 
-      if (!newCard) return
-
-      table.getPlayers()[0].addHand(newCard)
-      playerCardDiv.innerHTML += CardView.renderCard(newCard)
+      await ActionView.handleNewCard(player, table, playerCardDiv)
 
       await DELAY(500)
       CardView.rotateCards('userCardDiv')
       MainView.setScore(table)
       MainView.setPlayerStatus('HIT')
+      player.setGameStatus('hit')
+      // 追加終了
+
+      const score: number = player.getHandScore()
+      const status: string = score < 21 ? 'HIT' : score === 21 ? 'STAND' : 'BUST'
+
+      // スコアが 21 未満のとき HIT & STAND ボタンを有効化する
+      if (status === 'HIT') {
+        ActionView.ableButtons(betOrActionDiv)
+      }
+
+      await DELAY(1500)
+      MainView.setPlayerStatus(status)
+      player.setGameStatus(status.toLowerCase())
+
+      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
     })
 
     // Double ボタン
     betOrActionDiv.querySelector('#doubleBtn')?.addEventListener('click', async () => {
       const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-      const newCard: Card | undefined = table.getDeck().drawOne()
 
-      if (!newCard) return
-
-      table.getPlayers()[0].addHand(newCard)
-      playerCardDiv.innerHTML += CardView.renderCard(newCard)
+      await ActionView.handleNewCard(player, table, playerCardDiv)
 
       await DELAY(500)
       CardView.rotateCards('userCardDiv')
       MainView.setScore(table)
 
       // ベット額の更新
-      const betAmount: number = table.getPlayers()[0].getBet()
-      const ownChips: number = table.getPlayers()[0].getChips()
-      MainView.setPlayerBetAmount(table, betAmount * 2)
-      MainView.setPlayerOwnChips(table, ownChips - betAmount)
+      const betAmount: number = player.getBet()
+      const ownChips: number = player.getChips()
+      MainView.setPlayerBetAmount(player, betAmount * 2)
+      MainView.setPlayerOwnChips(player, ownChips - betAmount)
 
       await DELAY(1500)
-      const status: string = table.getPlayers()[0].getHandScore() <= 21 ? 'STAND' : 'BUST'
+      const status: string = player.getHandScore() <= 21 ? 'STAND' : 'BUST'
       MainView.setPlayerStatus(status)
-      table.getPlayers()[0].setGameStatus(status)
+      player.setGameStatus(status.toLowerCase())
+
+      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
     })
 
     for (const action of actions) {
@@ -110,11 +133,29 @@ export class ActionView {
     })
   }
 
+  public static async handleNewCard(player: Player, table: Table, cardDiv: HTMLElement): Promise<void> {
+    const newCard: Card | undefined = table.getDeck().drawOne()
+    if (!newCard) return
+
+    player.addHand(newCard)
+    cardDiv.innerHTML += CardView.renderCard(newCard)
+  }
+
+  // ボタン要素を disabled に設定する
   public static disableButtons(betOrActionDiv: HTMLElement): void {
     const buttons = Array.from(betOrActionDiv.querySelectorAll('.btn')) as HTMLButtonElement[]
     buttons.forEach((button) => {
       button.disabled = true
-      button.classList.add('opacity-80')
+      button.classList.add('opacity-70')
+    })
+  }
+
+  // ボタン要素の disabled を解除する
+  public static ableButtons(betOrActionDiv: HTMLElement): void {
+    const buttons = Array.from(betOrActionDiv.querySelectorAll('.btn-sp')) as HTMLButtonElement[]
+    buttons.forEach((button) => {
+      button.disabled = false
+      button.classList.remove('opacity-70')
     })
   }
 }

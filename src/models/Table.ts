@@ -58,7 +58,13 @@ export class Table {
     return Null : このメソッドは、プレーヤの状態を更新するだけです。
     例.プレイヤーが「ヒット」し、手札が21以上の場合、gameStatusを「バスト」に設定し、チップからベットを引きます。
   */
-  evaluateMove(player: Player): void {}
+  evaluateMove(player: Player): void {
+    if (player.getChips() <= 0) player.setGameStatus('broken')
+    if (player.getHandScore() > 21) {
+      player.setGameStatus('bust')
+      player.setChips(player.getChips() - player.getBet())
+    }
+  }
 
   /*
     return String: 新しいターンが始まる直前の全プレイヤーの状態を表す文字列。
@@ -123,8 +129,14 @@ export class Table {
   // acting フェーズを終了させるために使う
   allPlayerActionsResolved(): boolean {
     const resolvedPlayers = this.players.filter((player: Player) => {
-      const status: string = player.getGameStatus()
-      return status === 'broken' || status === 'stand' || status === 'bust' || status === 'surrender'
+      const status: string = player.getGameStatus().toLowerCase()
+      return (
+        status === 'broken' ||
+        status === 'stand' ||
+        status === 'bust' ||
+        status === 'surrender' ||
+        status === 'blackjack'
+      )
     })
     return resolvedPlayers.length === this.players.length
   }

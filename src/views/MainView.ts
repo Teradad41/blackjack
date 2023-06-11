@@ -1,6 +1,7 @@
 import { MAINFIELD } from '../config'
 import { Table } from '../models/Table'
 import { STATUSCOLOR } from '../config'
+import { Player } from '../models/Player'
 
 export class MainView {
   public static render(table: Table): void {
@@ -9,7 +10,7 @@ export class MainView {
       MAINFIELD.innerHTML = `
         <div class="h-screen flex justify-center" style="background: #1D4434; color: white;">            
           <div class="container pt-10">
-            <p class="text-center text-yellow-300 text-3xl">House</p>
+            <p id="house" class="text-center text-yellow-300 text-3xl">House</p>
             <div class="flex justify-center py-2">
               <button class="bg-white value-circle rounded-full cursor-default" disabled>
                 <p id="houseScore" class="text-black mb-1 font-bold text-xl">0</p>
@@ -20,7 +21,7 @@ export class MainView {
 
             <div id="playersDiv" class="flex justify-center pt-[3.2rem]">
               <div id="userDiv" class="flex flex-col items-center">
-                <p class="text-center text-yellow-300 text-3xl">${table.getPlayers()[0].getName()}</p>
+                <p id="player" class="text-center text-yellow-300 text-3xl">${table.getPlayers()[0].getName()}</p>
                 <div id="playerChipDiv" class="text-center text-white flex p-1 justify-between">
                   <p class="rem1 px-2 text-left">BET: <span id="onBetChips" class="text-xl">${table
                     .getPlayers()[0]
@@ -81,19 +82,19 @@ export class MainView {
   }
 
   // ベット額を更新する
-  public static setPlayerBetAmount(table: Table, betAmount: number): void {
+  public static setPlayerBetAmount(player: Player, betAmount: number): void {
     const playerOnBetDiv = MAINFIELD?.querySelector('#onBetChips') as HTMLElement
 
     if (playerOnBetDiv !== null) playerOnBetDiv.innerHTML = betAmount.toString()
-    table.getPlayers()[0].setBet(betAmount)
+    player.setBet(betAmount)
   }
 
   // 保有しているチップ額を更新する
-  public static setPlayerOwnChips(table: Table, ownChipAmount: number): void {
+  public static setPlayerOwnChips(player: Player, ownChipAmount: number): void {
     const playerOwnChipsDiv = MAINFIELD?.querySelector('#ownChips') as HTMLElement
 
     if (playerOwnChipsDiv !== null) playerOwnChipsDiv.innerHTML = ownChipAmount.toString()
-    table.getPlayers()[0].setChips(ownChipAmount)
+    player.setChips(ownChipAmount)
   }
 
   public static displayNone(ele: HTMLElement): void {

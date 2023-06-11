@@ -8,6 +8,8 @@ export const STATUSCOLOR: { [key: string]: string } = {
   DOUBLE: 'bg-blue-700',
   BUST: 'bg-purple-700',
   BROKEN: 'bg-black',
+  BLACKJACK: 'bg-teal-500',
+  'ON TURN': 'bg-orange-400',
 }
 export function DELAY(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))

@@ -13,7 +13,7 @@ export class CardView {
       <div class="back rounded shadow-xl absolute bg-gradient-to-br from-red-900 to-red-600 border-4 border-white flex justify-center items-center ${color}">
         <div class="text-3xl text-white opacity-50">♦</div>
       </div>
-      <div class="front rounded shadow-xl bg-white absolute flex justify-center items-center text-red-500">
+      <div class="front rounded shadow-xl bg-white absolute flex justify-center items-center ${color}">
         <div class="w-4 text-center absolute top-0 left-1">
           <div class="h-4 text-l">${rank}</div>
           <div class="h-4 mt-1">${symbol}</div>
@@ -28,13 +28,13 @@ export class CardView {
     `
   }
 
-  public static rotateCards(divName: string): void {
+  public static rotateCards(divName: string, times: string = 'notInitial'): void {
     const cardDiv: HTMLElement = MAINFIELD?.querySelector(`#${divName}`) as HTMLElement
     if (!cardDiv) return
 
     const cards = Array.from(cardDiv.querySelectorAll('.card'))
     // House は一枚だけを表にする
-    if (divName === 'houseCardDiv') {
+    if (divName === 'houseCardDiv' && times === 'initial') {
       const card: Element = cards[0]
       if (card) {
         this.addRotateClass(card, '.front', 'rotate-front')
