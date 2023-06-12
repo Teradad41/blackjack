@@ -5,8 +5,10 @@ import { Player } from '../models/Player'
 
 export class StartView {
   public static render(): void {
-    if (STARTPAGE)
-      STARTPAGE.innerHTML = `
+    if (!STARTPAGE) return
+
+    MainView.displayBlock(STARTPAGE)
+    STARTPAGE.innerHTML = `
         <div class="background-container flex items-center justify-center">
             <form class="startGameForm">
                 <div class="mb-4">

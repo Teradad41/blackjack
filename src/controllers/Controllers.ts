@@ -3,7 +3,7 @@ import { CardView } from '../views/CardView'
 import { MainView } from '../views/MainView'
 import { BetView } from '../views/BetView'
 import { ActionView } from '../views/ActionView'
-import { DELAY, MAINFIELD } from '../config'
+import { DELAY } from '../config'
 import { Table } from '../models/Table'
 import { Player } from '../models/Player'
 import { ResultModalView } from '../views/ResultModalView'
@@ -38,7 +38,7 @@ export class Controller {
   }
 
   // action フェーズ （ハウス）
-  public static async houseActiongPhase(table: Table): Promise<void> {
+  public static async houseActionPhase(table: Table): Promise<void> {
     await DELAY(700)
     BetView.setTurnColor('house', 'player')
     MainView.setStatusField('ON TURN', 'house')
@@ -58,6 +58,7 @@ export class Controller {
       CardView.rotateCards('houseCardDiv')
       await DELAY(1000)
       MainView.setHouseScore(table)
+      await DELAY(700)
     }
 
     const houseStatus = () => {
@@ -66,22 +67,25 @@ export class Controller {
       else return 'bust'
     }
 
-    house.setGameStatus(houseStatus())
     MainView.setStatusField(houseStatus().toUpperCase(), 'house')
+    house.setGameStatus(houseStatus())
 
     Controller.evaluatingWinnersPhase(table)
   }
 
-  // 評価に基づきテーブルを更新する
+  // evaluating フェーズ
   public static async evaluatingWinnersPhase(table: Table) {
     table.setGamePhase('evaluatingWinners')
 
     await DELAY(2000)
-    // ページ内で評価を行う
     ResultModalView.render(table)
   }
 
+  // roundOver フェーズ
   public static roundOverPhase(table: Table) {
+    table.setGamePhase('roundOver')
+    table.incrementRound()
+
     MainView.setStatusField('WAITING', 'house')
     MainView.setStatusField('WAITING', 'player')
 
@@ -91,7 +95,5 @@ export class Controller {
 
     MainView.render(table)
     BetView.render(table)
-
-    table.incrementRound()
   }
 }

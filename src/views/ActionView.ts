@@ -52,7 +52,7 @@ export class ActionView {
       ActionView.disableButtons(betOrActionDiv)
 
       await DELAY(1000)
-      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActionPhase(table)
     }
 
     // Surrender ボタン
@@ -60,7 +60,7 @@ export class ActionView {
       MainView.setStatusField('SURRENDER', 'player')
       player.setGameStatus('surrender')
 
-      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActionPhase(table)
     })
 
     // STAND ボタン
@@ -68,7 +68,7 @@ export class ActionView {
       MainView.setStatusField('STAND', 'player')
       player.setGameStatus('stand')
 
-      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActionPhase(table)
     })
 
     // Hit ボタン
@@ -78,12 +78,13 @@ export class ActionView {
 
       await DELAY(500)
       CardView.rotateCards('userCardDiv')
-      MainView.setPlayerScore(table)
       MainView.setStatusField('HIT', 'player')
       player.setGameStatus('hit')
       // 追加終了
 
       await DELAY(1000)
+      MainView.setPlayerScore(table)
+
       const score: number = player.getHandScore()
       if (score > 21) {
         MainView.setStatusField('BUST', 'player')
@@ -96,7 +97,9 @@ export class ActionView {
       }
 
       await DELAY(1500)
-      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
+      if (table.allPlayerActionsResolved()) {
+        Controller.houseActionPhase(table)
+      }
     })
 
     // Double ボタン
@@ -106,7 +109,6 @@ export class ActionView {
 
       await DELAY(500)
       CardView.rotateCards('userCardDiv')
-      MainView.setPlayerScore(table)
 
       // ベット額の更新
       const betAmount: number = player.getBet()
@@ -114,20 +116,23 @@ export class ActionView {
       MainView.setPlayerBetAmount(player, betAmount * 2)
       MainView.setPlayerOwnChips(player, ownChips - betAmount)
 
-      await DELAY(1500)
+      await DELAY(1300)
+      MainView.setPlayerScore(table)
       const status: string = player.getHandScore() <= 21 ? 'DOUBLE' : 'BUST'
       MainView.setStatusField(status, 'player')
       player.setGameStatus(status.toLowerCase())
 
-      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
+      if (table.allPlayerActionsResolved()) {
+        Controller.houseActionPhase(table)
+      }
     })
 
     for (const action of actions) {
-      this.bindAction(table, betOrActionDiv, action.selector, action.status)
+      this.bindAction(betOrActionDiv, action.selector, action.status)
     }
   }
 
-  private static bindAction(table: Table, betOrActionDiv: HTMLElement, selector: string, status: string): void {
+  private static bindAction(betOrActionDiv: HTMLElement, selector: string, status: string): void {
     const button = betOrActionDiv.querySelector(selector) as HTMLButtonElement
     button?.addEventListener('click', () => {
       MainView.setStatusField(status, 'player')

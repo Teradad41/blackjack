@@ -16,8 +16,12 @@ export class Card {
   }
 
   public getRankNumber(): number {
-    if (this.rank === 'A') return 11
-    else if (this.rank === 'J' || this.rank === 'Q' || this.rank === 'K') return 10
-    else return parseInt(this.rank, 10)
+    if (typeof this.rank === 'string') {
+      if (this.rank === 'A') return 11
+      else if (this.rank === 'J' || this.rank === 'Q' || this.rank === 'K') return 10
+      else return parseInt(this.rank, 10)
+    } else {
+      return 0
+    }
   }
 }

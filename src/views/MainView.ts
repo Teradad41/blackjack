@@ -75,6 +75,7 @@ export class MainView {
       `
   }
 
+  // 画面に表示されるハウスのスコアを更新する
   public static setHouseScore(table: Table, status: string = 'notInitial'): void {
     const houseScoreDiv = MAINFIELD?.querySelector('#houseScore') as HTMLElement
 
@@ -88,27 +89,12 @@ export class MainView {
     }
   }
 
+  // 画面に表示されるプレイヤーのスコアを更新する
   public static setPlayerScore(table: Table): void {
     const playerScoreDiv = MAINFIELD?.querySelector('#playerScore') as HTMLElement
-    const playerScore = table.getPlayers()[0].getHandScore().toString()
 
-    if (playerScoreDiv) playerScoreDiv.innerHTML = playerScore
-  }
-
-  public static(table: Table, status: string = 'notInitial'): void {
-    const houseScoreDiv = MAINFIELD?.querySelector('#houseScore') as HTMLElement
-    const playerScoreDiv = MAINFIELD?.querySelector('#playerScore') as HTMLElement
-
-    const houseScore =
-      status === 'initial'
-        ? table.getHouse().getHand()[0].getRankNumber().toString()
-        : table.getHouse().getHandScore().toString()
-
-    const playerScore = table.getPlayers()[0].getHandScore().toString()
-
-    if (houseScoreDiv && playerScoreDiv) {
-      houseScoreDiv.innerHTML = houseScore
-      playerScoreDiv.innerHTML = playerScore
+    if (playerScoreDiv) {
+      playerScoreDiv.innerHTML = table.getPlayers()[0].getHandScore().toString()
     }
   }
 
@@ -116,16 +102,20 @@ export class MainView {
   public static setPlayerBetAmount(player: Player, betAmount: number): void {
     const playerOnBetDiv = MAINFIELD?.querySelector('#onBetChips') as HTMLElement
 
-    if (playerOnBetDiv !== null) playerOnBetDiv.innerHTML = betAmount.toString()
-    player.setBet(betAmount)
+    if (playerOnBetDiv !== null) {
+      playerOnBetDiv.innerHTML = betAmount.toString()
+      player.setBet(betAmount)
+    }
   }
 
   // 保有しているチップ額を更新する
   public static setPlayerOwnChips(player: Player, ownChipAmount: number): void {
     const playerOwnChipsDiv = MAINFIELD?.querySelector('#ownChips') as HTMLElement
 
-    if (playerOwnChipsDiv !== null) playerOwnChipsDiv.innerHTML = ownChipAmount.toString()
-    player.setChips(ownChipAmount)
+    if (playerOwnChipsDiv !== null) {
+      playerOwnChipsDiv.innerHTML = ownChipAmount.toString()
+      player.setChips(ownChipAmount)
+    }
   }
 
   // 手札を画面に描画する (ハウス、プレイヤー)
