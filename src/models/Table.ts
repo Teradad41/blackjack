@@ -10,6 +10,7 @@ export class Table {
   private house: Player
   private gamePhase: string
   private turnCorner: number
+  private round: number
   private resultsLog: string[]
 
   constructor(gameType: string, betDenomination: number[] = [5, 20, 50, 100]) {
@@ -19,6 +20,7 @@ export class Table {
     this.deck = new Deck(gameType)
     this.deck.shuffle()
     this.turnCorner = 0
+    this.round = 1
     this.resultsLog = []
 
     this.players = []
@@ -51,6 +53,14 @@ export class Table {
 
   public getDeck(): Deck {
     return this.deck
+  }
+
+  public getRound(): number {
+    return this.round
+  }
+
+  public incrementRound(): void {
+    this.round++
   }
 
   /*
@@ -88,7 +98,7 @@ export class Table {
     else return undefined
   }
 
-  blackjackClearPlayerHandsAndBets(): void {
+  blackjackClearHandsAndBets(): void {
     for (const player of this.players) {
       player.clearHand()
       player.clearBet()

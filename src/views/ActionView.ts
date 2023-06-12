@@ -51,7 +51,7 @@ export class ActionView {
       ActionView.disableButtons(betOrActionDiv)
 
       await DELAY(1000)
-      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
     }
 
     // Surrender ボタン
@@ -59,7 +59,7 @@ export class ActionView {
       MainView.setStatusField('SURRENDER', 'player')
       player.setGameStatus('surrender')
 
-      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
     })
 
     // STAND ボタン
@@ -67,7 +67,7 @@ export class ActionView {
       MainView.setStatusField('STAND', 'player')
       player.setGameStatus('stand')
 
-      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
     })
 
     // Hit ボタン
@@ -95,7 +95,7 @@ export class ActionView {
       MainView.setStatusField(status, 'player')
       player.setGameStatus(status.toLowerCase())
 
-      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
     })
 
     // Double ボタン
@@ -119,7 +119,7 @@ export class ActionView {
       MainView.setStatusField(status, 'player')
       player.setGameStatus(status.toLowerCase())
 
-      if (table.allPlayerActionsResolved()) Controller.evaluatingPhase(table)
+      if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
     })
 
     for (const action of actions) {

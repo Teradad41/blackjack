@@ -46,6 +46,10 @@ export class Player {
     return this.winAmount
   }
 
+  public setWinAmount(winAmount: number): void {
+    this.winAmount = winAmount
+  }
+
   public getBet(): number {
     return this.bet
   }
@@ -58,14 +62,14 @@ export class Player {
     return this.hand
   }
 
-  // 手持ち自体を置き換える
-  public setHand(hand: Card[]): void {
-    this.hand = hand
-  }
-
   // 一枚だけを追加する
   public addHand(card: Card): void {
     this.hand.push(card)
+  }
+
+  // 手持ち自体を置き換える
+  public setHand(hand: Card[]): void {
+    this.hand = hand
   }
 
   public setGameStatus(status: string): void {

@@ -94,7 +94,7 @@ export class BetView {
 
       MainView.setPlayerBetAmount(table.getPlayers()[0], betAmount)
       MainView.setPlayerOwnChips(table.getPlayers()[0], ownChips)
-      Controller.actingPhase(table, betOrActionDiv)
+      Controller.playerActingPhase(table, betOrActionDiv)
     })
   }
 

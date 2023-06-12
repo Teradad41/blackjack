@@ -49,7 +49,8 @@ export class MainView {
               </div>
             </div>
           </div>
-        </div>  
+          <div id="modalContent" class="text-black"></div>
+        </div>
       `
     }
   }
