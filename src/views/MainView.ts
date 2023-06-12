@@ -2,6 +2,8 @@ import { MAINFIELD } from '../config'
 import { Table } from '../models/Table'
 import { STATUSCOLOR } from '../config'
 import { Player } from '../models/Player'
+import { CardView } from './CardView'
+import { Card } from '../models/Card'
 
 export class MainView {
   public static render(table: Table): void {
@@ -17,7 +19,7 @@ export class MainView {
               </button>
             </div>
             <div id="houseStatusDiv" class="flex justify-center pt-1 pb-2">
-              <button class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
+              <button class="bg-gray-600 shadow-xl rounded-lg w-40 py-1 cursor-default" disabled>
                 WAITING
               </button>
             </div>
@@ -40,7 +42,7 @@ export class MainView {
                   </button>
                 </div>
                 <div id="playerStatusDiv" class="flex justify-center py-1">
-                  <button class="bg-gray-600 rounded-lg w-40 py-1 cursor-default" disabled>
+                  <button class="bg-gray-600 shadow-xl rounded-lg w-40 py-1 cursor-default" disabled>
                     WAITING
                   </button>
                 </div>
@@ -52,6 +54,8 @@ export class MainView {
           <div id="modalContent" class="text-black"></div>
         </div>
       `
+
+      MainView.renderHand(table)
     }
   }
 
@@ -122,6 +126,31 @@ export class MainView {
 
     if (playerOwnChipsDiv !== null) playerOwnChipsDiv.innerHTML = ownChipAmount.toString()
     player.setChips(ownChipAmount)
+  }
+
+  // 手札を画面に描画する (ハウス、プレイヤー)
+  private static renderHand(table: Table) {
+    const houseCardDiv = MAINFIELD?.querySelector('#houseCardDiv') as HTMLElement
+    const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
+
+    if (houseCardDiv) {
+      houseCardDiv.innerHTML = ''
+      table
+        .getHouse()
+        .getHand()
+        .forEach((card: Card) => {
+          houseCardDiv.innerHTML += CardView.renderCard(card)
+        })
+    }
+
+    if (playerCardDiv) {
+      playerCardDiv.innerHTML = ''
+      for (const player of table.getPlayers()) {
+        player.getHand().forEach((card: Card) => {
+          playerCardDiv.innerHTML += CardView.renderCard(card)
+        })
+      }
+    }
   }
 
   public static displayNone(ele: HTMLElement): void {

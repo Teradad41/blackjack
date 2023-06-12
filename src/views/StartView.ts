@@ -33,6 +33,7 @@ export class StartView {
             </form>
         </div>
       `
+
     // Game Start
     STARTPAGE?.querySelector('.startGameForm')!.addEventListener('submit', (e) => {
       e.preventDefault()

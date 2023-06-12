@@ -18,19 +18,8 @@ export class Controller {
     const table: Table = new Table(player.getGameType())
     table.setPlayers([player])
 
-    MainView.render(table)
-    const houseCardDiv = MAINFIELD?.querySelector('#houseCardDiv') as HTMLElement
-    const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-
     table.blackjackAssignPlayerHands()
-    houseCardDiv.innerHTML += CardView.renderCard(table.getHouse().getHand()[0])
-    houseCardDiv.innerHTML += CardView.renderCard(table.getHouse().getHand()[1])
-
-    for (const player of table.getPlayers()) {
-      playerCardDiv.innerHTML += CardView.renderCard(player.getHand()[0])
-      playerCardDiv.innerHTML += CardView.renderCard(player.getHand()[1])
-    }
-
+    MainView.render(table)
     BetView.render(table)
   }
 
@@ -58,12 +47,12 @@ export class Controller {
     MainView.setHouseScore(table)
 
     const house: Player = table.getHouse()
-    const houseCardDiv = MAINFIELD?.querySelector('#houseCardDiv') as HTMLElement
 
     await DELAY(1000)
     while (house.getHandScore() < 17) {
       await DELAY(1000)
-      await ActionView.handleNewCard(house, table, houseCardDiv)
+      // メインの動作 カードを追加する
+      ActionView.addNewCardToPlayer(house, table, 'house')
       MainView.setStatusField('HIT', 'house')
       await DELAY(700)
       CardView.rotateCards('houseCardDiv')
@@ -77,8 +66,8 @@ export class Controller {
       else return 'bust'
     }
 
-    MainView.setStatusField(houseStatus().toUpperCase(), 'house')
     house.setGameStatus(houseStatus())
+    MainView.setStatusField(houseStatus().toUpperCase(), 'house')
 
     Controller.evaluatingWinnersPhase(table)
   }
@@ -87,40 +76,8 @@ export class Controller {
   public static async evaluatingWinnersPhase(table: Table) {
     table.setGamePhase('evaluatingWinners')
 
-    const house: Player = table.getHouse()
-    const player: Player = table.getPlayers()[0]
-    const playerBetAmount: number = player.getBet()
-    let winAmount: number = 0
-
-    const houseStatus: string = house.getGameStatus()
-    const playerStatus: string = player.getGameStatus()
-
-    switch (playerStatus) {
-      case 'bust':
-        winAmount = 0
-        break
-      case 'surrender':
-        winAmount += playerBetAmount / 2
-        break
-      case 'blackjack':
-        winAmount = houseStatus === 'blackjack' ? playerBetAmount : playerBetAmount * 2.5
-        break
-      case 'double':
-        if (houseStatus === 'bust' || player.getHandScore() > house.getHandScore()) winAmount = playerBetAmount * 2
-        if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
-        else winAmount = 0
-        break
-      case 'stand':
-        if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
-        else
-          winAmount = houseStatus === 'bust' || house.getHandScore() < player.getHandScore() ? playerBetAmount * 2 : 0
-    }
-
-    table.blackjackClearHandsAndBets()
-    const currentChips = player.getChips()
-    player.setChips(winAmount + currentChips)
-
-    await DELAY(1500)
+    await DELAY(2000)
+    // ページ内で評価を行う
     ResultModalView.render(table)
   }
 
@@ -128,21 +85,13 @@ export class Controller {
     MainView.setStatusField('WAITING', 'house')
     MainView.setStatusField('WAITING', 'player')
 
-    // プレイヤーとディーラーの手札とベットをクリアする
+    // 手札とベットをクリアし、新しく手札を追加する
+    table.blackjackClearHandsAndBets()
     table.blackjackAssignPlayerHands()
 
-    // const houseCardDiv = MAINFIELD?.querySelector('#houseCardDiv') as HTMLElement
-    // const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-    // houseCardDiv.innerHTML = "";
-    // houseCardDiv.innerHTML += CardView.renderCard(table.getHouse().getHand()[0])
-    // houseCardDiv.innerHTML += CardView.renderCard(table.getHouse().getHand()[1])
+    MainView.render(table)
+    BetView.render(table)
 
-    // playerCardDiv.innerHTML = "";
-    // for (const player of table.getPlayers()) {
-    //   playerCardDiv.innerHTML += CardView.renderCard(player.getHand()[0])
-    //   playerCardDiv.innerHTML += CardView.renderCard(player.getHand()[1])
-    // }
-
-    // BetView.render(table)
+    table.incrementRound()
   }
 }

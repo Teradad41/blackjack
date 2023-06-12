@@ -45,6 +45,7 @@ export class ActionView {
       { selector: '#doubleBtn', status: 'DOUBLE' },
     ]
 
+    // BlackJackのとき
     if (table.getPlayers()[0].isBlackJack()) {
       MainView.setStatusField('BLACKJACK', 'player')
       player.setGameStatus('blackjack')
@@ -72,9 +73,8 @@ export class ActionView {
 
     // Hit ボタン
     betOrActionDiv.querySelector('#hitBtn')?.addEventListener('click', async () => {
-      const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-
-      await ActionView.handleNewCard(player, table, playerCardDiv)
+      // カードを一枚追加
+      ActionView.addNewCardToPlayer(player, table, 'player')
 
       await DELAY(500)
       CardView.rotateCards('userCardDiv')
@@ -83,26 +83,26 @@ export class ActionView {
       player.setGameStatus('hit')
       // 追加終了
 
+      await DELAY(1000)
       const score: number = player.getHandScore()
-      const status: string = score < 21 ? 'HIT' : score === 21 ? 'STAND' : 'BUST'
-
-      // スコアが 21 未満のとき HIT & STAND ボタンを有効化する
-      if (status === 'HIT') {
+      if (score > 21) {
+        MainView.setStatusField('BUST', 'player')
+        player.setGameStatus('bust')
+      } else if (score === 21) {
+        MainView.setStatusField('STAND', 'player')
+        player.setGameStatus('stand')
+      } else {
         ActionView.ableButtons(betOrActionDiv)
       }
 
       await DELAY(1500)
-      MainView.setStatusField(status, 'player')
-      player.setGameStatus(status.toLowerCase())
-
       if (table.allPlayerActionsResolved()) Controller.houseActiongPhase(table)
     })
 
     // Double ボタン
     betOrActionDiv.querySelector('#doubleBtn')?.addEventListener('click', async () => {
-      const playerCardDiv = MAINFIELD?.querySelector('#userCardDiv') as HTMLElement
-
-      await ActionView.handleNewCard(player, table, playerCardDiv)
+      //　カードを一枚追加
+      ActionView.addNewCardToPlayer(player, table, 'player')
 
       await DELAY(500)
       CardView.rotateCards('userCardDiv')
@@ -154,11 +154,18 @@ export class ActionView {
   }
 
   // カードを一枚追加する
-  public static async handleNewCard(player: Player, table: Table, cardDiv: HTMLElement): Promise<void> {
-    const newCard: Card | undefined = table.getDeck().drawOne()
-    if (!newCard) return
+  public static addNewCardToPlayer(player: Player, table: Table, type: string): void {
+    const cardDivMap: { [key: string]: string } = {
+      house: 'houseCardDiv',
+      player: 'userCardDiv',
+    }
 
-    player.addHand(newCard)
-    cardDiv.innerHTML += CardView.renderCard(newCard)
+    const cardDiv = MAINFIELD?.querySelector(`#${cardDivMap[type]}`)
+    const newCard: Card | undefined = table.getDeck().drawOne()
+
+    if (newCard && cardDiv) {
+      player.addHand(newCard)
+      cardDiv.innerHTML += CardView.renderCard(newCard)
+    }
   }
 }
