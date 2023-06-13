@@ -27,6 +27,10 @@ export class Table {
     this.house = new Player('house', 'house', this.gameType)
   }
 
+  public getGameType(): string {
+    return this.gameType
+  }
+
   public getPlayers(): Player[] {
     return this.players
   }

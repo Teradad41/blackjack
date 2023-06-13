@@ -9,7 +9,7 @@ export class BetView {
 
     const betOrActionDiv = MAINFIELD.querySelector('#betOrActionDiv') as HTMLElement
     betOrActionDiv.innerHTML = `
-    <div class="flex flex-col justify-center items-center mt-7 px-7 py-4" style="box-shadow: 0px -8px 10px rgba(0, 228, 0), 0px 8px 10px rgba(0, 228, 0);">
+    <div class="flex flex-col justify-center items-center mt-10 px-7 py-4" style="box-shadow: 0px -8px 10px rgba(0, 228, 0), 0px 8px 10px rgba(0, 228, 0);">
         <div class="flex justify-center">
             <p class="px-5 text-3xl pb-1">BET: <span id="userBetAmount" class="text-4xl">${table
               .getPlayers()[0]
@@ -96,19 +96,5 @@ export class BetView {
       MainView.setPlayerOwnChips(table.getPlayers()[0], ownChips)
       Controller.playerActingPhase(table, betOrActionDiv)
     })
-  }
-
-  // 現在のプレイヤーを強調する
-  public static setTurnColor(onTurn: string, outOfTurn: string): void {
-    const onturnPlayerDiv = MAINFIELD?.querySelector(`#${onTurn}`) as HTMLElement
-    const outOfTurnPlayerDiv = MAINFIELD?.querySelector(`#${outOfTurn}`) as HTMLElement
-
-    if (onturnPlayerDiv !== null) {
-      onturnPlayerDiv.classList.remove('text-red-600')
-      onturnPlayerDiv.classList.add('text-yellow-300')
-
-      outOfTurnPlayerDiv.classList.remove('text-yellow-300')
-      outOfTurnPlayerDiv.classList.add('text-red-600')
-    }
   }
 }

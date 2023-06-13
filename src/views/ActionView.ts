@@ -10,6 +10,8 @@ import { Controller } from '../controllers/Controllers'
 export class ActionView {
   public static async render(table: Table, betOrActionDiv: HTMLElement): Promise<void> {
     const player = table.getPlayers()[0]
+    let houseActionPhaseCalled: boolean = false
+
     betOrActionDiv.innerHTML = `
         <div class="flex justify-around items-center pt-[3rem]">
             <div class="flex flex-col items-center justify-center px-6">
@@ -52,44 +54,43 @@ export class ActionView {
       ActionView.disableButtons(betOrActionDiv)
 
       await DELAY(1000)
-      if (table.allPlayerActionsResolved()) Controller.houseActionPhase(table)
+      if (table.allPlayerActionsResolved()) await Controller.houseActionPhase(table)
     }
 
     // Surrender ボタン
-    betOrActionDiv.querySelector('#surrenderBtn')?.addEventListener('click', () => {
+    betOrActionDiv.querySelector('#surrenderBtn')?.addEventListener('click', async () => {
       MainView.setStatusField('SURRENDER', 'player')
       player.setGameStatus('surrender')
 
-      if (table.allPlayerActionsResolved()) Controller.houseActionPhase(table)
+      if (table.allPlayerActionsResolved()) {
+        await Controller.houseActionPhase(table)
+      }
     })
 
     // STAND ボタン
-    betOrActionDiv.querySelector('#standBtn')?.addEventListener('click', () => {
+    betOrActionDiv.querySelector('#standBtn')?.addEventListener('click', async () => {
       MainView.setStatusField('STAND', 'player')
       player.setGameStatus('stand')
 
-      if (table.allPlayerActionsResolved()) Controller.houseActionPhase(table)
+      if (table.allPlayerActionsResolved()) {
+        await Controller.houseActionPhase(table)
+      }
     })
 
     // Hit ボタン
     betOrActionDiv.querySelector('#hitBtn')?.addEventListener('click', async () => {
-      // カードを一枚追加
       ActionView.addNewCardToPlayer(player, table, 'player')
 
-      await DELAY(500)
+      await DELAY(700)
       CardView.rotateCards('userCardDiv')
       MainView.setStatusField('HIT', 'player')
-      player.setGameStatus('hit')
-      // 追加終了
-
-      await DELAY(1000)
       MainView.setPlayerScore(table)
+      player.setGameStatus('hit')
 
-      const score: number = player.getHandScore()
-      if (score > 21) {
+      if (player.getHandScore() > 21) {
         MainView.setStatusField('BUST', 'player')
         player.setGameStatus('bust')
-      } else if (score === 21) {
+      } else if (player.getHandScore() === 21) {
         MainView.setStatusField('STAND', 'player')
         player.setGameStatus('stand')
       } else {
@@ -97,8 +98,9 @@ export class ActionView {
       }
 
       await DELAY(1500)
-      if (table.allPlayerActionsResolved()) {
-        Controller.houseActionPhase(table)
+      if (table.allPlayerActionsResolved() && !houseActionPhaseCalled) {
+        houseActionPhaseCalled = true
+        await Controller.houseActionPhase(table)
       }
     })
 
@@ -123,7 +125,7 @@ export class ActionView {
       player.setGameStatus(status.toLowerCase())
 
       if (table.allPlayerActionsResolved()) {
-        Controller.houseActionPhase(table)
+        await Controller.houseActionPhase(table)
       }
     })
 

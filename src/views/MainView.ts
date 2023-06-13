@@ -12,7 +12,7 @@ export class MainView {
       MAINFIELD.innerHTML = `
         <div class="h-screen flex justify-center" style="background: #1D4434; color: white;">            
           <div class="container pt-6">
-            <p id="house" class="text-center text-red-600 text-3xl">House</p>
+            <p id="house" class="text-center text-yellow-400 text-3xl">House</p>
             <div class="flex justify-center py-2">
               <button class="bg-white value-circle rounded-full cursor-default" disabled>
                 <p id="houseScore" class="text-black mb-1 font-bold text-xl">0</p>
@@ -23,11 +23,11 @@ export class MainView {
                 WAITING
               </button>
             </div>
-            <div id="houseCardDiv" class="flex justify-center py-2"></div>
-
+            <div id="houseCardDiv" class="flex justify-center py-2 relative"></div>
+            
             <div id="playersDiv" class="flex justify-center pt-7">
-              <div id="userDiv" class="flex flex-col items-center">
-                <p id="player" class="text-center text-red-600 text-3xl">${table.getPlayers()[0].getName()}</p>
+              <div id="userDiv" class="flex w-1/2 flex-col items-center">
+                <p id="player" class="text-center text-yellow-400 text-3xl">${table.getPlayers()[0].getName()}</p>
                 <div id="playerChipDiv" class="text-center text-white flex p-1 justify-between">
                   <p class="rem1 px-2 text-left">BET: <span id="onBetChips" class="text-xl">${table
                     .getPlayers()[0]
@@ -46,7 +46,7 @@ export class MainView {
                     WAITING
                   </button>
                 </div>
-                <div id="userCardDiv" class="flex justify-center pt-4"></div>
+                <div id="userCardDiv" class="flex justify-center pt-4 relative"></div>
                 <div id="betOrActionDiv"></div>
               </div>
             </div>

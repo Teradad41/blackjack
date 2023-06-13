@@ -28,7 +28,6 @@ export class Controller {
     table.setGamePhase('acting')
     MainView.setStatusField('ON TURN', 'player')
     ActionView.render(table, betOrActionDiv)
-    BetView.setTurnColor('player', 'house')
 
     await DELAY(500)
     CardView.rotateCards('houseCardDiv', 'initial')
@@ -37,11 +36,10 @@ export class Controller {
     MainView.setPlayerScore(table)
   }
 
-  // action フェーズ （ハウス）
   public static async houseActionPhase(table: Table): Promise<void> {
     await DELAY(700)
-    BetView.setTurnColor('house', 'player')
     MainView.setStatusField('ON TURN', 'house')
+
     await DELAY(1000)
     CardView.rotateCards('houseCardDiv')
     MainView.setHouseScore(table)
@@ -51,14 +49,18 @@ export class Controller {
     await DELAY(1000)
     while (house.getHandScore() < 17) {
       await DELAY(1000)
+      console.log('5')
       // メインの動作 カードを追加する
       ActionView.addNewCardToPlayer(house, table, 'house')
       MainView.setStatusField('HIT', 'house')
       await DELAY(700)
       CardView.rotateCards('houseCardDiv')
+      console.log('6')
       await DELAY(1000)
       MainView.setHouseScore(table)
+      console.log('7')
       await DELAY(700)
+      console.log('8')
     }
 
     const houseStatus = () => {
@@ -92,6 +94,9 @@ export class Controller {
     // 手札とベットをクリアし、新しく手札を追加する
     table.blackjackClearHandsAndBets()
     table.blackjackAssignPlayerHands()
+
+    //　デッキを新しくしてシャッフル
+    table.getDeck().resetDeck()
 
     MainView.render(table)
     BetView.render(table)

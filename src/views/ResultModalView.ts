@@ -9,27 +9,51 @@ export class ResultModalView {
     if (!modalContentDiv) return
 
     const winAmount: number = ResultModalView.compareScore(table)
-    modalContentDiv.innerHTML = ResultModalView.createModalContent(table, winAmount)
 
-    const modalOverlay = modalContentDiv.querySelector('#modalOverlay') as HTMLElement
-    const modalDiv = modalContentDiv.querySelector('#modalDiv') as HTMLElement
-    const nextBtn = modalContentDiv.querySelector('#nextBtn') as HTMLButtonElement
-    const quitBtn = modalContentDiv.querySelector('#quitBtn') as HTMLButtonElement
+    // プレイヤーのチップが０以上のとき
+    if (table.getPlayers()[0].getChips() > 0) {
+      modalContentDiv.innerHTML = ResultModalView.createModalContent(table, winAmount)
 
-    // モーダルの表示
-    ResultModalView.showModal(modalOverlay, modalDiv)
+      const modalOverlay = modalContentDiv.querySelector('#modalOverlay') as HTMLElement
+      const modalDiv = modalContentDiv.querySelector('#modalDiv') as HTMLElement
+      // モーダルの表示
+      ResultModalView.showModal(modalOverlay, modalDiv)
 
-    // Next ボタンが押されたとき
-    nextBtn?.addEventListener('click', () => {
-      ResultModalView.hideModal(modalOverlay, modalDiv)
-      Controller.roundOverPhase(table)
-    })
+      const nextBtn = modalContentDiv.querySelector('#nextBtn') as HTMLButtonElement
+      const quitBtn = modalContentDiv.querySelector('#quitBtn') as HTMLButtonElement
 
-    // Quit ボタンが押されたとき
-    quitBtn?.addEventListener('click', () => {
-      ResultModalView.hideModal(modalOverlay, modalDiv)
-      Controller.renderStartPage()
-    })
+      nextBtn?.addEventListener('click', () => {
+        ResultModalView.hideModal(modalOverlay, modalDiv)
+        Controller.roundOverPhase(table)
+      })
+
+      quitBtn?.addEventListener('click', () => {
+        ResultModalView.hideModal(modalOverlay, modalDiv)
+        Controller.renderStartPage()
+      })
+    } else {
+      // プレイヤーのチップが０以下 → ゲームオーバー
+      modalContentDiv.innerHTML = ResultModalView.createGameOverContent()
+
+      const modalOverlay = modalContentDiv.querySelector('#modalOverlay') as HTMLElement
+      const modalDiv = modalContentDiv.querySelector('#modalDiv') as HTMLElement
+
+      ResultModalView.showModal(modalOverlay, modalDiv)
+      const homeBtn = modalContentDiv.querySelector('#homeBtn') as HTMLButtonElement
+      const continueBtn = modalContentDiv.querySelector('#continueBtn') as HTMLButtonElement
+
+      homeBtn.addEventListener('click', () => {
+        ResultModalView.hideModal(modalOverlay, modalDiv)
+        Controller.renderStartPage()
+      })
+
+      continueBtn.addEventListener('click', () => {
+        ResultModalView.hideModal(modalOverlay, modalDiv)
+        const userName: string = table.getPlayers()[0].getName()
+        const gameType: string = table.getGameType()
+        Controller.startBlackJack(new Player(userName, 'user', gameType))
+      })
+    }
   }
 
   private static createModalContent(table: Table, winAmount: number): string {
@@ -83,13 +107,13 @@ export class ResultModalView {
                 </div>
                 <div class="flex justify-between">
                     <div class="w-1/2 pr-2">
-                        <button type="button"
+                        <button id="homeBtn" type="button"
                         class="w-full h-full border hover:bg-gray-200 border-gray-900 focus:ring-2 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                         HOME
                         </button>
                     </div>
                     <div class="w-1/2 pl-2">
-                        <button type="button"
+                        <button id="continueBtn" type="button"
                         class="w-full h-full bg-green-500 hover:bg-green-400 text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                         CONTINUE
                         </button>
@@ -126,7 +150,8 @@ export class ResultModalView {
         else winAmount = 0
         break
       case 'stand':
-        if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
+        if (houseStatus === 'blackjack') winAmount = 0
+        else if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
         else
           winAmount = houseStatus === 'bust' || house.getHandScore() < player.getHandScore() ? playerBetAmount * 2 : 0
     }
@@ -138,15 +163,19 @@ export class ResultModalView {
   }
 
   private static showModal(modalOverlay: HTMLElement, modalDiv: HTMLElement): void {
-    modalOverlay.classList.remove('hidden')
-    modalDiv.classList.remove('invisible', 'opacity-0')
-    modalDiv.classList.add('opacity-1')
+    if (modalOverlay && modalDiv) {
+      modalOverlay.classList.remove('hidden')
+      modalDiv.classList.remove('invisible', 'opacity-0')
+      modalDiv.classList.add('opacity-1')
+    }
   }
 
   private static hideModal(modalOverlay: HTMLElement, modalDiv: HTMLElement): void {
-    modalOverlay.classList.add('hidden')
-    modalDiv.classList.add('invisible', 'opacity-0')
-    modalDiv.classList.remove('opacity-1')
+    if (modalOverlay && modalDiv) {
+      modalOverlay.classList.add('hidden')
+      modalDiv.classList.add('invisible', 'opacity-0')
+      modalDiv.classList.remove('opacity-1')
+    }
   }
 
   private static judgeWinOrLose(winAmount: number, playerBetAmount: number): string {
