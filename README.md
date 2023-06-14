@@ -1,8 +1,7 @@
-# Card Game
-Recursion project5  
+## Recursion project5  
 MVCモデルを用いてBlackJackを実装しました。
 
-## Demo
+## Image
 <img width="1680" alt="スクリーンショット 2023-06-14 13 08 52" src="https://github.com/Teradad41/Card_Game/assets/107381511/df12b87e-f32b-42c9-9084-f34caa2cd48b">
 
 ## About
@@ -22,6 +21,16 @@ MVCモデルを用いてBlackJackを実装しました。
 - パッケージバンドラー：webpack
 - コードフォマッター：Prettier
 - パッケージ管理システム：npm
+
+## Setup
+```zsh
+npm install
+```
+```zsh
+npm run start
+# or
+yarn start
+```
 
 ## What I learned
 - TypeScriptでの開発の経験と、webpackやnpm scriptsなどの環境構築の経験を得ることができた。
