@@ -42,8 +42,15 @@ export class StartView {
       const userNameInput = STARTPAGE?.querySelector('#userName') as HTMLInputElement
       const gameTypeInput = STARTPAGE?.querySelector('#gameType') as HTMLSelectElement
 
-      if (STARTPAGE) MainView.displayNone(STARTPAGE)
-      Controller.startBlackJack(new Player(userNameInput.value, 'user', gameTypeInput.value))
+      if (STARTPAGE) {
+        MainView.displayNone(STARTPAGE)
+
+        const bot1: Player = new Player('BOT1', 'ai', gameTypeInput.value)
+        const player: Player = new Player(userNameInput.value, 'user', gameTypeInput.value)
+        const bot2: Player = new Player('BOT2', 'ai', gameTypeInput.value)
+
+        Controller.startBlackJack([bot1, player, bot2])
+      }
     })
   }
 }

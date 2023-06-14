@@ -14,69 +14,59 @@ export class Controller {
   }
 
   // betting フェーズ
-  public static startBlackJack(player: Player): void {
-    const table: Table = new Table(player.getGameType())
-    table.setPlayers([player])
+  public static startBlackJack(players: Player[]): void {
+    const table: Table = new Table(players[1].getGameType())
+    table.setPlayers(players)
+    table.setGamePhase('betting')
 
     table.blackjackAssignPlayerHands()
     MainView.render(table)
     BetView.render(table)
   }
 
-  // acting フェーズ (プレイヤー)
+  // acting フェーズ (ボット・プレイヤー)
   public static async playerActingPhase(table: Table, betOrActionDiv: HTMLElement): Promise<void> {
     table.setGamePhase('acting')
-    MainView.setStatusField('ON TURN', 'player')
-    ActionView.render(table, betOrActionDiv)
+    betOrActionDiv.innerHTML = ''
 
     await DELAY(500)
-    CardView.rotateCards('houseCardDiv', 'initial')
-    CardView.rotateCards('userCardDiv')
-    MainView.setHouseScore(table, 'initial')
-    MainView.setPlayerScore(table)
-  }
 
-  public static async houseActionPhase(table: Table): Promise<void> {
+    const cardDivIds = ['houseCardDiv', 'bot1CardDiv', 'userCardDiv', 'bot2CardDiv']
+    cardDivIds.forEach((cardDivId: string, index: number) => {
+      const times: string | undefined = cardDivId === 'houseCardDiv' ? 'initial' : undefined
+      // カードを表向きにする
+      CardView.rotateCards(cardDivId, times)
+      // ハウスと全プレイヤーのスコアを更新する
+      if (index === 0) MainView.setHouseScore(table, 'initial')
+      if (index > 0) MainView.setPlayerScore(table.getPlayers()[index - 1], cardDivId.replace('CardDiv', ''))
+    })
+
+    // AIプレイヤーのベットに関する操作
+    table
+      .getPlayers()
+      .filter((player: Player) => player.getType() === 'ai')
+      .forEach((bot: Player) => {
+        const betAmount: number = bot.aiPlayerDecideBetAmount()
+        MainView.setBotBetAmount(bot, betAmount)
+        MainView.setBotOwnChips(bot, bot.getChips() - betAmount)
+      })
+
     await DELAY(700)
-    MainView.setStatusField('ON TURN', 'house')
+    const players: Player[] = table.getPlayers()
+    const playerDivId: string[] = ['bot1', 'player', 'bot2']
 
-    await DELAY(1000)
-    CardView.rotateCards('houseCardDiv')
-    MainView.setHouseScore(table)
-
-    const house: Player = table.getHouse()
-
-    await DELAY(1000)
-    while (house.getHandScore() < 17) {
-      await DELAY(1000)
-      console.log('5')
-      // メインの動作 カードを追加する
-      ActionView.addNewCardToPlayer(house, table, 'house')
-      MainView.setStatusField('HIT', 'house')
-      await DELAY(700)
-      CardView.rotateCards('houseCardDiv')
-      console.log('6')
-      await DELAY(1000)
-      MainView.setHouseScore(table)
-      console.log('7')
-      await DELAY(700)
-      console.log('8')
+    // プレイヤー・ボットのターン
+    for (let i = 0; i < players.length; i++) {
+      await this.handlePlayerTurn(table, players[i], playerDivId[i], betOrActionDiv)
     }
 
-    const houseStatus = () => {
-      if (house.getHandScore() === 21 && house.getHand().length === 2) return 'blackjack'
-      else if (house.getHandScore() >= 17 && house.getHandScore() <= 21) return 'stand'
-      else return 'bust'
-    }
-
-    MainView.setStatusField(houseStatus().toUpperCase(), 'house')
-    house.setGameStatus(houseStatus())
-
+    //　ハウスのターン
+    await Controller.processPlayerActionPhase(table, table.getHouse(), 'house')
     Controller.evaluatingWinnersPhase(table)
   }
 
   // evaluating フェーズ
-  public static async evaluatingWinnersPhase(table: Table) {
+  public static async evaluatingWinnersPhase(table: Table): Promise<void> {
     table.setGamePhase('evaluatingWinners')
 
     await DELAY(2000)
@@ -84,7 +74,7 @@ export class Controller {
   }
 
   // roundOver フェーズ
-  public static roundOverPhase(table: Table) {
+  public static roundOverPhase(table: Table): void {
     table.setGamePhase('roundOver')
     table.incrementRound()
 
@@ -100,5 +90,59 @@ export class Controller {
 
     MainView.render(table)
     BetView.render(table)
+  }
+
+  // ハウス・ボットの actionPhase を管理する
+  public static async processPlayerActionPhase(table: Table, player: Player, playerDivId: string): Promise<void> {
+    await DELAY(500)
+    MainView.setStatusField('ON TURN', playerDivId)
+
+    if (playerDivId === 'house') {
+      await DELAY(500)
+      CardView.rotateCards(`${playerDivId}CardDiv`)
+      MainView.setHouseScore(table)
+    }
+
+    await DELAY(1000)
+    while (player.getHandScore() < 17) {
+      await DELAY(500)
+      // メインの動作 カードを追加する
+      ActionView.addNewCardToPlayer(player, table, playerDivId)
+      MainView.setStatusField('HIT', playerDivId)
+      await DELAY(700)
+      CardView.rotateCards(`${playerDivId}CardDiv`)
+      await DELAY(1000)
+      if (playerDivId === 'house') {
+        MainView.setHouseScore(table)
+      } else {
+        MainView.setPlayerScore(player, playerDivId)
+      }
+
+      await DELAY(700)
+    }
+
+    const playerStatus = () => {
+      if (player.getHandScore() === 21 && player.getHand().length === 2) return 'blackjack'
+      else if (player.getHandScore() >= 17 && player.getHandScore() <= 21) return 'stand'
+      else return 'bust'
+    }
+
+    MainView.setStatusField(playerStatus().toUpperCase(), playerDivId)
+    player.setGameStatus(playerStatus())
+  }
+
+  // ヘルパー関数
+  private static async handlePlayerTurn(
+    table: Table,
+    player: Player,
+    playerDivId: string,
+    betOrActionDiv: HTMLElement
+  ): Promise<void> {
+    if (player.getType() === 'user') {
+      MainView.setStatusField('ON TURN', playerDivId)
+      return new Promise((resolve) => ActionView.render(table, betOrActionDiv, resolve))
+    } else {
+      return Controller.processPlayerActionPhase(table, player, playerDivId)
+    }
   }
 }

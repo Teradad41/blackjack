@@ -11,11 +11,12 @@ export class ResultModalView {
     const winAmount: number = ResultModalView.compareScore(table)
 
     // プレイヤーのチップが０以上のとき
-    if (table.getPlayers()[0].getChips() > 0) {
+    if (table.getPlayers()[1].getChips() > 0) {
       modalContentDiv.innerHTML = ResultModalView.createModalContent(table, winAmount)
 
       const modalOverlay = modalContentDiv.querySelector('#modalOverlay') as HTMLElement
       const modalDiv = modalContentDiv.querySelector('#modalDiv') as HTMLElement
+
       // モーダルの表示
       ResultModalView.showModal(modalOverlay, modalDiv)
 
@@ -49,15 +50,20 @@ export class ResultModalView {
 
       continueBtn.addEventListener('click', () => {
         ResultModalView.hideModal(modalOverlay, modalDiv)
-        const userName: string = table.getPlayers()[0].getName()
+        const userName: string = table.getPlayers()[1].getName()
         const gameType: string = table.getGameType()
-        Controller.startBlackJack(new Player(userName, 'user', gameType))
+
+        const bot1: Player = new Player('BOT1', 'ai', gameType)
+        const player: Player = new Player(userName, 'user', gameType)
+        const bot2: Player = new Player('BOT2', 'ai', gameType)
+
+        Controller.startBlackJack([bot1, player, bot2])
       })
     }
   }
 
   private static createModalContent(table: Table, winAmount: number): string {
-    const playerBetAmount: number = table.getPlayers()[0].getBet()
+    const playerBetAmount: number = table.getPlayers()[1].getBet()
     const winOrLose: string = ResultModalView.judgeWinOrLose(winAmount, playerBetAmount)
     return `
         <div id="modalOverlay" class="fixed inset-0 bg-black opacity-70 z-10 hidden"></div>
@@ -76,7 +82,17 @@ export class ResultModalView {
                     </thead>
                     <tbody class="flex flex-col items-center justify-between w-full rounded-b-xl">
                         <tr class="flex w-full border-b">
-                            <td class="text-center py-4 w-4/12">${table.getPlayers()[0].getName()}</td>
+                            <td class="text-center py-4 w-4/12">BOT<span class="text-xl">1</span></td>
+                            <td class="text-center py-4 w-4/12">${winOrLose}</td>
+                            <td class="text-center py-4 w-4/12">\$${winAmount - playerBetAmount}</td>
+                        </tr>
+                        <tr class="flex w-full border-b">
+                            <td class="text-center py-4 w-4/12">${table.getPlayers()[1].getName()}</td>
+                            <td class="text-center py-4 w-4/12">${winOrLose}</td>
+                            <td class="text-center py-4 w-4/12">\$${winAmount - playerBetAmount}</td>
+                        </tr>
+                        <tr class="flex w-full border-b">
+                            <td class="text-center py-4 w-4/12">BOT<span class="text-xl">2</span></td>
                             <td class="text-center py-4 w-4/12">${winOrLose}</td>
                             <td class="text-center py-4 w-4/12">\$${winAmount - playerBetAmount}</td>
                         </tr>
@@ -126,7 +142,7 @@ export class ResultModalView {
 
   private static compareScore(table: Table): number {
     const house: Player = table.getHouse()
-    const player: Player = table.getPlayers()[0]
+    const player: Player = table.getPlayers()[1]
     const playerBetAmount: number = player.getBet()
     let winAmount: number = 0
 

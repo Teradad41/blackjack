@@ -5,12 +5,11 @@ import { CardView } from '../views/CardView'
 import { Card } from 'models/Card'
 import { DELAY } from '../config'
 import { Player } from 'models/Player'
-import { Controller } from '../controllers/Controllers'
 
 export class ActionView {
-  public static async render(table: Table, betOrActionDiv: HTMLElement): Promise<void> {
-    const player = table.getPlayers()[0]
-    let houseActionPhaseCalled: boolean = false
+  public static async render(table: Table, betOrActionDiv: HTMLElement, callback: Function): Promise<void> {
+    const player = table.getPlayers()[1]
+    let bot2ActionCalled: boolean = false
 
     betOrActionDiv.innerHTML = `
         <div class="flex justify-around items-center pt-[3rem]">
@@ -47,34 +46,33 @@ export class ActionView {
       { selector: '#doubleBtn', status: 'DOUBLE' },
     ]
 
+    const setPlayerActionAndProceed = (actionName: string): void => {
+      player.setGameStatus(`${actionName}`)
+
+      if (player.checkFinishedAction() && !bot2ActionCalled) {
+        bot2ActionCalled = true
+        callback()
+      }
+    }
+
     // BlackJackのとき
-    if (table.getPlayers()[0].isBlackJack()) {
+    if (table.getPlayers()[1].isBlackJack()) {
+      await DELAY(500)
       MainView.setStatusField('BLACKJACK', 'player')
-      player.setGameStatus('blackjack')
       ActionView.disableButtons(betOrActionDiv)
 
-      await DELAY(1000)
-      if (table.allPlayerActionsResolved()) await Controller.houseActionPhase(table)
+      await DELAY(500)
+      setPlayerActionAndProceed('blackjack')
     }
 
     // Surrender ボタン
-    betOrActionDiv.querySelector('#surrenderBtn')?.addEventListener('click', async () => {
-      MainView.setStatusField('SURRENDER', 'player')
-      player.setGameStatus('surrender')
-
-      if (table.allPlayerActionsResolved()) {
-        await Controller.houseActionPhase(table)
-      }
+    betOrActionDiv.querySelector('#surrenderBtn')?.addEventListener('click', () => {
+      setPlayerActionAndProceed('surrender')
     })
 
     // STAND ボタン
-    betOrActionDiv.querySelector('#standBtn')?.addEventListener('click', async () => {
-      MainView.setStatusField('STAND', 'player')
-      player.setGameStatus('stand')
-
-      if (table.allPlayerActionsResolved()) {
-        await Controller.houseActionPhase(table)
-      }
+    betOrActionDiv.querySelector('#standBtn')?.addEventListener('click', () => {
+      setPlayerActionAndProceed('stand')
     })
 
     // Hit ボタン
@@ -83,50 +81,45 @@ export class ActionView {
 
       await DELAY(700)
       CardView.rotateCards('userCardDiv')
-      MainView.setStatusField('HIT', 'player')
-      MainView.setPlayerScore(table)
-      player.setGameStatus('hit')
+      MainView.setPlayerScore(player, 'user')
 
-      if (player.getHandScore() > 21) {
+      const score: number = player.getHandScore()
+      let playerStatus: string = 'hit'
+
+      await DELAY(700)
+      if (score > 21) {
         MainView.setStatusField('BUST', 'player')
-        player.setGameStatus('bust')
-      } else if (player.getHandScore() === 21) {
+        playerStatus = 'bust'
+      } else if (score === 21) {
         MainView.setStatusField('STAND', 'player')
-        player.setGameStatus('stand')
+        playerStatus = 'stand'
       } else {
         ActionView.ableButtons(betOrActionDiv)
+        return
       }
 
-      await DELAY(1500)
-      if (table.allPlayerActionsResolved() && !houseActionPhaseCalled) {
-        houseActionPhaseCalled = true
-        await Controller.houseActionPhase(table)
-      }
+      await DELAY(500)
+      setPlayerActionAndProceed(playerStatus)
     })
 
     // Double ボタン
     betOrActionDiv.querySelector('#doubleBtn')?.addEventListener('click', async () => {
-      //　カードを一枚追加
       ActionView.addNewCardToPlayer(player, table, 'player')
 
-      await DELAY(500)
+      await DELAY(700)
       CardView.rotateCards('userCardDiv')
+      MainView.setPlayerScore(player, 'user')
 
       // ベット額の更新
       const betAmount: number = player.getBet()
-      const ownChips: number = player.getChips()
       MainView.setPlayerBetAmount(player, betAmount * 2)
-      MainView.setPlayerOwnChips(player, ownChips - betAmount)
+      MainView.setPlayerOwnChips(player, player.getChips() - betAmount)
 
-      await DELAY(1300)
-      MainView.setPlayerScore(table)
+      await DELAY(1000)
       const status: string = player.getHandScore() <= 21 ? 'DOUBLE' : 'BUST'
       MainView.setStatusField(status, 'player')
-      player.setGameStatus(status.toLowerCase())
 
-      if (table.allPlayerActionsResolved()) {
-        await Controller.houseActionPhase(table)
-      }
+      setPlayerActionAndProceed(status.toLowerCase())
     })
 
     for (const action of actions) {
@@ -164,15 +157,18 @@ export class ActionView {
   public static addNewCardToPlayer(player: Player, table: Table, type: string): void {
     const cardDivMap: { [key: string]: string } = {
       house: 'houseCardDiv',
+      bot1: 'bot1CardDiv',
       player: 'userCardDiv',
+      bot2: 'bot2CardDiv',
     }
 
     const cardDiv = MAINFIELD?.querySelector(`#${cardDivMap[type]}`)
     const newCard: Card | undefined = table.getDeck().drawOne()
 
-    if (newCard && cardDiv) {
+    if (cardDiv && newCard) {
       player.addHand(newCard)
-      cardDiv.innerHTML += CardView.renderCard(newCard)
+      const cardSize: string = type === 'bot1' || type === 'bot2' ? 'botSize' : 'normal'
+      cardDiv.innerHTML += CardView.renderCard(newCard, cardSize)
     }
   }
 }

@@ -1,21 +1,16 @@
 import { Controller } from '../controllers/Controllers'
 import { MAINFIELD } from '../config'
 import { Table } from '../models/Table'
-import { MainView } from './MainView'
+import { Player } from '../models/Player'
 
 export class BetView {
   public static render(table: Table): void {
     if (!MAINFIELD) return
 
+    const players: Player[] = table.getPlayers()
     const betOrActionDiv = MAINFIELD.querySelector('#betOrActionDiv') as HTMLElement
     betOrActionDiv.innerHTML = `
-    <div class="flex flex-col justify-center items-center mt-10 px-7 py-4" style="box-shadow: 0px -8px 10px rgba(0, 228, 0), 0px 8px 10px rgba(0, 228, 0);">
-        <div class="flex justify-center">
-            <p class="px-5 text-3xl pb-1">BET: <span id="userBetAmount" class="text-4xl">${table
-              .getPlayers()[0]
-              .getBet()
-              .toString()}</span></p>
-        </div>
+    <div class="flex flex-col justify-center items-center px-7 py-3">
         <div class="flex justify-around py-6">
             <div class="px-2">
                 <div class="chip w-16 h-16 bg-red-500 rounded-full shadow-xl flex justify-center items-center cursor-pointer hover:opacity-80" data-chips="${table
@@ -55,45 +50,54 @@ export class BetView {
         </div>
     </div>
     <div class="flex justify-between">
-        <button id="clearBtn" class="bg-gradient-to-r from-lime-300 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 shadow-lg shadow-lime-500/50 dark:shadow-lg dark:shadow-lime-800/80 font-bold rounded-lg w-32 py-2.5 mx-3 text-gray-500">
+        <button id="clearBtn" class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-red-700 shadow-lg shadow-red-600/50 font-bold rounded-lg w-32 py-2.5 mx-3">
         CLEAR
         </button>
-        <button id="dealBtn" class="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 hover:bg-gradient-to-br focus:ring-4      focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 font-bold rounded-lg w-32 py-2.5 mx-3 text-gray-600">DEAL
+        <button id="dealBtn" class="text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:opacity-80 focus:ring-2 focus:outline-none focus: ring-green-600 shadow-lg shadow-green-600/50 font-bold rounded-lg w-32 py-2.5 mx-3">DEAL
         </button>
     </div>
-            `
+    `
 
-    const betAmountDiv: HTMLElement | null = betOrActionDiv.querySelector('#userBetAmount') as HTMLElement
+    const betAmountDiv: HTMLElement | null = MAINFIELD.querySelector('#onBetChips') as HTMLElement
     const ownChipsDiv: HTMLElement | null = MAINFIELD.querySelector('#ownChips') as HTMLElement
-    const betChips: Element[] = [...betOrActionDiv.querySelectorAll('.chip')]
+    const betChips: Element[] = [...betOrActionDiv.querySelectorAll('.chip')] as Element[]
 
     // チップ額の追加
     betChips.forEach((chip) => {
       chip.addEventListener('click', () => {
-        const currentChip: number = parseInt(betAmountDiv.innerHTML || '0', 10)
+        const currentBetChips: number = parseInt(betAmountDiv.innerHTML || '0', 10)
         const chipValue: string | null = chip.getAttribute('data-chips')
 
         if (chipValue !== null) {
-          const totalChip = currentChip + parseInt(chipValue, 10)
-          if (totalChip <= table.getPlayers()[0].getChips()) betAmountDiv.innerHTML = totalChip.toString()
+          const totalChip: number = currentBetChips + parseInt(chipValue, 10)
+          const ownChips: number = players[1].getChips()
+
+          if (totalChip <= ownChips) {
+            betAmountDiv.innerHTML = totalChip.toString()
+            ownChipsDiv.innerHTML = (ownChips - totalChip).toString()
+          }
         }
       })
     })
 
     // Clearボタン
     betOrActionDiv.querySelector('#clearBtn')?.addEventListener('click', () => {
-      if (betAmountDiv.innerHTML !== null) betAmountDiv.innerHTML = '0'
+      if (betAmountDiv.innerHTML !== null) {
+        betAmountDiv.innerHTML = '0'
+        ownChipsDiv.innerHTML = players[1].getChips().toString()
+      }
     })
 
     // Dealボタン
     betOrActionDiv.querySelector('#dealBtn')?.addEventListener('click', () => {
       const betAmount: number = parseInt(betAmountDiv.innerHTML, 10)
-      const ownChips: number = parseInt(ownChipsDiv.innerHTML, 10) - betAmount
+      const ownChips: number = parseInt(ownChipsDiv.innerHTML, 10)
 
       if (betAmount === 0) return
 
-      MainView.setPlayerBetAmount(table.getPlayers()[0], betAmount)
-      MainView.setPlayerOwnChips(table.getPlayers()[0], ownChips)
+      players[1].setBet(betAmount)
+      players[1].setChips(ownChips)
+
       Controller.playerActingPhase(table, betOrActionDiv)
     })
   }

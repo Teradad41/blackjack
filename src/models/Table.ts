@@ -103,10 +103,10 @@ export class Table {
   }
 
   blackjackClearHandsAndBets(): void {
-    for (const player of this.players) {
+    this.players.forEach((player: Player) => {
       player.clearHand()
       player.clearBet()
-    }
+    })
 
     this.house.clearHand()
     this.house.clearBet()

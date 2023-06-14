@@ -84,6 +84,10 @@ export class Player {
     this.bet = 0
   }
 
+  public getType(): string {
+    return this.type
+  }
+
   // 状態を考慮した上で、プレイヤーが行った意思決定を返す
   public promptPlayer(): GameDecision {
     const action: string = this.gameStatus
@@ -97,7 +101,29 @@ export class Player {
     else return false
   }
 
-  // 合計が21を超える場合、手札の各Aを、合計が21以下になるまで10を引く
+  public checkFinishedAction(): boolean {
+    const status: string = this.getGameStatus().toLowerCase()
+    return (
+      status === 'broken' ||
+      status === 'stand' ||
+      status === 'bust' ||
+      status === 'surrender' ||
+      status === 'blackjack' ||
+      status === 'double'
+    )
+  }
+
+  // AIプレイヤーのベットを決める
+  public aiPlayerDecideBetAmount(): number {
+    if (this.getGameStatus() === 'broke') return 0
+
+    let budgetForOneRound: number = this.getChips() / 5 // 1ラウンドのベット上限
+    // AIのベット額をランダムに決定（5で割り切れるようにし、最低でも5をベットする）
+    let betAmount: number = Math.floor(Math.random() * (budgetForOneRound / 5 - 5) + 5) * 5
+    return betAmount
+  }
+
+  // 手札の合計 (合計が21を超える場合、手札の各Aを、合計が21以下になるまで10を引く)
   public getHandScore(): number {
     let handScore: number = 0
     let aceCount: number = 0

@@ -2,14 +2,16 @@ import { MAINFIELD } from '../config'
 import { Card } from '../models/Card'
 
 export class CardView {
-  public static renderCard(card: Card): string {
+  public static renderCard(card: Card, cardSize: string): string {
     const suit: string = card.getSuit()
     const rank: string = card.getRank()
     const color: string = suit === 'H' || suit === 'D' ? 'text-red-600' : 'text-black'
     const symbol: string = CardView.getSuitSymbol(suit)
+    const h: string = cardSize === 'normal' ? 'h-36' : 'h-32'
+    const w: string = cardSize === 'normal' ? 'w-28' : 'w-24'
 
     return `
-    <div class="card h-36 w-28 relative mx-1 cursor-pointer">
+    <div class="card ${h} ${w} relative mx-1 cursor-pointer">
       <div class="back rounded shadow-xl absolute bg-gradient-to-br from-red-900 to-red-600 border-4 border-white flex justify-center items-center ${color}">
         <div class="text-3xl text-white opacity-50">♦</div>
       </div>
