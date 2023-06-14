@@ -8,27 +8,25 @@ export class ResultModalView {
     const modalContentDiv = MAINFIELD?.querySelector('#modalContent')
     if (!modalContentDiv) return
 
-    const winAmount: number = ResultModalView.compareScore(table)
+    const winAmounts: number[] = ResultModalView.compareScore(table)
 
     // プレイヤーのチップが０以上のとき
     if (table.getPlayers()[1].getChips() > 0) {
-      modalContentDiv.innerHTML = ResultModalView.createModalContent(table, winAmount)
+      modalContentDiv.innerHTML = ResultModalView.createModalContent(table, winAmounts)
 
       const modalOverlay = modalContentDiv.querySelector('#modalOverlay') as HTMLElement
       const modalDiv = modalContentDiv.querySelector('#modalDiv') as HTMLElement
 
-      // モーダルの表示
       ResultModalView.showModal(modalOverlay, modalDiv)
 
-      const nextBtn = modalContentDiv.querySelector('#nextBtn') as HTMLButtonElement
-      const quitBtn = modalContentDiv.querySelector('#quitBtn') as HTMLButtonElement
-
-      nextBtn?.addEventListener('click', () => {
+      // Next ボタン
+      modalContentDiv.querySelector('#nextBtn')?.addEventListener('click', () => {
         ResultModalView.hideModal(modalOverlay, modalDiv)
         Controller.roundOverPhase(table)
       })
 
-      quitBtn?.addEventListener('click', () => {
+      // Quit ボタン
+      modalContentDiv.querySelector('#quitBtn')?.addEventListener('click', () => {
         ResultModalView.hideModal(modalOverlay, modalDiv)
         Controller.renderStartPage()
       })
@@ -40,31 +38,32 @@ export class ResultModalView {
       const modalDiv = modalContentDiv.querySelector('#modalDiv') as HTMLElement
 
       ResultModalView.showModal(modalOverlay, modalDiv)
-      const homeBtn = modalContentDiv.querySelector('#homeBtn') as HTMLButtonElement
-      const continueBtn = modalContentDiv.querySelector('#continueBtn') as HTMLButtonElement
 
-      homeBtn.addEventListener('click', () => {
+      // HOME ボタン
+      modalContentDiv.querySelector('#homeBtn')?.addEventListener('click', () => {
         ResultModalView.hideModal(modalOverlay, modalDiv)
         Controller.renderStartPage()
       })
 
-      continueBtn.addEventListener('click', () => {
+      // Continue ボタン
+      modalContentDiv.querySelector('#continueBtn')?.addEventListener('click', () => {
         ResultModalView.hideModal(modalOverlay, modalDiv)
-        const userName: string = table.getPlayers()[1].getName()
+
+        const playerNames: string[] = ['BOT1', table.getPlayers()[1].getName(), 'BOT2']
         const gameType: string = table.getGameType()
 
-        const bot1: Player = new Player('BOT1', 'ai', gameType)
-        const player: Player = new Player(userName, 'user', gameType)
-        const bot2: Player = new Player('BOT2', 'ai', gameType)
-
-        Controller.startBlackJack([bot1, player, bot2])
+        const players = playerNames.map(
+          (name: string) => new Player(name, name === 'BOT1' || name === 'BOT2' ? 'ai' : 'user', gameType)
+        )
+        Controller.startBlackJack(players)
       })
     }
   }
 
-  private static createModalContent(table: Table, winAmount: number): string {
-    const playerBetAmount: number = table.getPlayers()[1].getBet()
-    const winOrLose: string = ResultModalView.judgeWinOrLose(winAmount, playerBetAmount)
+  private static createModalContent(table: Table, winAmount: number[]): string {
+    const playerBetAmounts: number[] = table.getPlayers().map((player: Player) => player.getBet())
+    const winOrLose: string[] = ResultModalView.judgeWinOrLose(winAmount, playerBetAmounts)
+
     return `
         <div id="modalOverlay" class="fixed inset-0 bg-black opacity-70 z-10 hidden"></div>
         <div id="modalDiv" class="fixed inset-0 flex items-center justify-center opacity-0 invisible transition-opacity z-20">
@@ -83,18 +82,18 @@ export class ResultModalView {
                     <tbody class="flex flex-col items-center justify-between w-full rounded-b-xl">
                         <tr class="flex w-full border-b">
                             <td class="text-center py-4 w-4/12">BOT<span class="text-xl">1</span></td>
-                            <td class="text-center py-4 w-4/12">${winOrLose}</td>
-                            <td class="text-center py-4 w-4/12">\$${winAmount - playerBetAmount}</td>
+                            <td class="text-center py-4 w-4/12">${winOrLose[0]}</td>
+                            <td class="text-center py-4 w-4/12">\$${winAmount[0] - playerBetAmounts[0]}</td>
                         </tr>
                         <tr class="flex w-full border-b">
                             <td class="text-center py-4 w-4/12">${table.getPlayers()[1].getName()}</td>
-                            <td class="text-center py-4 w-4/12">${winOrLose}</td>
-                            <td class="text-center py-4 w-4/12">\$${winAmount - playerBetAmount}</td>
+                            <td class="text-center py-4 w-4/12">${winOrLose[1]}</td>
+                            <td class="text-center py-4 w-4/12">\$${winAmount[1] - playerBetAmounts[1]}</td>
                         </tr>
                         <tr class="flex w-full border-b">
                             <td class="text-center py-4 w-4/12">BOT<span class="text-xl">2</span></td>
-                            <td class="text-center py-4 w-4/12">${winOrLose}</td>
-                            <td class="text-center py-4 w-4/12">\$${winAmount - playerBetAmount}</td>
+                            <td class="text-center py-4 w-4/12">${winOrLose[2]}</td>
+                            <td class="text-center py-4 w-4/12">\$${winAmount[2] - playerBetAmounts[2]}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -140,42 +139,47 @@ export class ResultModalView {
     `
   }
 
-  private static compareScore(table: Table): number {
+  private static compareScore(table: Table): number[] {
     const house: Player = table.getHouse()
-    const player: Player = table.getPlayers()[1]
-    const playerBetAmount: number = player.getBet()
-    let winAmount: number = 0
-
     const houseStatus: string = house.getGameStatus()
-    const playerStatus: string = player.getGameStatus()
+    const winAmounts: number[] = []
 
-    switch (playerStatus) {
-      case 'bust':
-        winAmount = 0
-        break
-      case 'surrender':
-        winAmount += playerBetAmount / 2
-        break
-      case 'blackjack':
-        winAmount = houseStatus === 'blackjack' ? playerBetAmount : Math.floor(playerBetAmount * 2.5)
-        break
-      case 'double':
-        if (houseStatus === 'bust') winAmount = playerBetAmount * 2
-        else if (player.getHandScore() > house.getHandScore()) winAmount = playerBetAmount * 2
-        else if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
-        else winAmount = 0
-        break
-      case 'stand':
-        if (houseStatus === 'blackjack') winAmount = 0
-        else if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
-        else
-          winAmount = houseStatus === 'bust' || house.getHandScore() < player.getHandScore() ? playerBetAmount * 2 : 0
+    for (const player of table.getPlayers()) {
+      const playerBetAmount: number = player.getBet()
+      const playerStatus: string = player.getGameStatus()
+
+      let winAmount: number = 0
+
+      switch (playerStatus) {
+        case 'bust':
+          winAmount = 0
+          break
+        case 'surrender':
+          winAmount += playerBetAmount / 2
+          break
+        case 'blackjack':
+          winAmount = houseStatus === 'blackjack' ? playerBetAmount : Math.floor(playerBetAmount * 2.5)
+          break
+        case 'double':
+          if (houseStatus === 'bust') winAmount = playerBetAmount * 2
+          else if (player.getHandScore() > house.getHandScore()) winAmount = playerBetAmount * 2
+          else if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
+          else winAmount = 0
+          break
+        case 'stand':
+          if (houseStatus === 'blackjack') winAmount = 0
+          else if (player.getHandScore() === house.getHandScore()) winAmount = playerBetAmount
+          else
+            winAmount = houseStatus === 'bust' || house.getHandScore() < player.getHandScore() ? playerBetAmount * 2 : 0
+      }
+
+      const currentChips = player.getChips()
+      player.setChips(winAmount + currentChips)
+
+      winAmounts.push(winAmount)
     }
 
-    const currentChips = player.getChips()
-    player.setChips(winAmount + currentChips)
-
-    return winAmount
+    return winAmounts
   }
 
   private static showModal(modalOverlay: HTMLElement, modalDiv: HTMLElement): void {
@@ -194,8 +198,12 @@ export class ResultModalView {
     }
   }
 
-  private static judgeWinOrLose(winAmount: number, playerBetAmount: number): string {
-    if (winAmount === playerBetAmount) return 'DRAW'
-    else return winAmount > playerBetAmount ? 'WIN' : 'LOSE'
+  private static judgeWinOrLose(winAmount: number[], playerBetAmount: number[]): string[] {
+    const res: string[] = []
+    for (let i = 0; i < winAmount.length; i++) {
+      if (winAmount[i] === playerBetAmount[i]) res.push('DRAW')
+      else res.push(winAmount[i] > playerBetAmount[i] ? 'WIN' : 'LOSE')
+    }
+    return res
   }
 }
