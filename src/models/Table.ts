@@ -11,7 +11,6 @@ export class Table {
   private gamePhase: string
   private turnCorner: number
   private round: number
-  private resultsLog: string[]
 
   constructor(gameType: string, betDenomination: number[] = [5, 20, 50, 100]) {
     this.gameType = gameType
@@ -21,7 +20,6 @@ export class Table {
     this.deck.shuffle()
     this.turnCorner = 0
     this.round = 1
-    this.resultsLog = []
 
     this.players = []
     this.house = new Player('house', 'house', this.gameType)
@@ -67,23 +65,6 @@ export class Table {
     this.round++
   }
 
-  /*
-    Player player : テーブルは、Player.promptPlayer()を使用してGameDecisionを取得し、GameDecisionとgameTypeに応じてPlayerの状態を更新します。
-    return Null : このメソッドは、プレーヤの状態を更新するだけです。
-    例.プレイヤーが「ヒット」し、手札が21以上の場合、gameStatusを「バスト」に設定し、チップからベットを引きます。
-  */
-  public evaluateTable(table: Table): void {
-    // if ()
-  }
-
-  /*
-    return String: 新しいターンが始まる直前の全プレイヤーの状態を表す文字列。
-    NOTE: このメソッドの出力は、各ラウンドの終了時にテーブルのresultsLogメンバを更新するために使用されます。
-  */
-  blackjackEvaluateAndGetRoundResults(): string {
-    return ''
-  }
-
   public blackjackAssignPlayerHands(): void {
     for (const player of this.players) {
       const hand: Card[] | undefined = this.checkNotUndefinedAndGetTwo()
@@ -114,17 +95,6 @@ export class Table {
 
   getTurnPlayer(): Player {
     return this.players[this.turnCorner % this.players.length]
-  }
-
-  /*
-    Number userData: テーブルモデルの外部から渡されるデータです。 
-    return null: このメソッドはテーブルの状態を更新するだけで、値を返しません。
-  */
-  public haveTurn(userData: number): void {
-    if (this.gamePhase === 'roundOver') return
-    const currentPlayer: Player = this.getTurnPlayer()
-    currentPlayer.promptPlayer()
-    this.turnCorner++
   }
 
   onFirstPlayer(): boolean {

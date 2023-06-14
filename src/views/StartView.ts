@@ -16,7 +16,6 @@ export class StartView {
                     <input class="w-full px-3 py-2 border rounded-xl focus:outline-green-600 shadow-xl"
                         id="userName"
                         type="text"
-                        value="TERADAD"
                         placeholder="Name"
                         required
                     >

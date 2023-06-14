@@ -1,5 +1,4 @@
 import { Card } from './Card'
-import { GameDecision } from './GameDicision'
 
 export class Player {
   private name: string
@@ -62,7 +61,7 @@ export class Player {
     return this.hand
   }
 
-  // 一枚だけを追加する
+  // 一枚だけ追加する
   public addHand(card: Card): void {
     this.hand.push(card)
   }
@@ -86,14 +85,6 @@ export class Player {
 
   public getType(): string {
     return this.type
-  }
-
-  // 状態を考慮した上で、プレイヤーが行った意思決定を返す
-  public promptPlayer(): GameDecision {
-    const action: string = this.gameStatus
-    const amount: number = this.bet
-
-    return new GameDecision(action, amount)
   }
 
   public isBlackJack(): boolean {
