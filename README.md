@@ -3,7 +3,7 @@ Recursion project5
 MVCモデルを用いてBlackJackを実装しました。
 
 ## Demo
-https://github.com/Teradad41/Card_Game/assets/107381511/df12b87e-f32b-42c9-9084-f34caa2cd48b
+<img width="1680" alt="スクリーンショット 2023-06-14 13 08 52" src="https://github.com/Teradad41/Card_Game/assets/107381511/df12b87e-f32b-42c9-9084-f34caa2cd48b">
 
 ## About
 ブラックジャックは、トランプのカードを使ったゲームです。カードには 4 つのスート（クラブ、ダイヤモンド、ハート、スペード）と、各スートに 13 のランク（A から K）があります。ゲームは、カジノ（ハウス）とプレイヤーで行われます。各プレイヤーはハウスと対戦し、1 対 1 で勝負します。
