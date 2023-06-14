@@ -1,7 +1,6 @@
 ## Recursion project5  
 MVCモデルを用いてBlackJackを実装しました。
 
-## Image
 <img width="1680" alt="スクリーンショット 2023-06-14 13 08 52" src="https://github.com/Teradad41/Card_Game/assets/107381511/df12b87e-f32b-42c9-9084-f34caa2cd48b">
 
 ## About
