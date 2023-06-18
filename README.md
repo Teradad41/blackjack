@@ -21,15 +21,8 @@ MVCモデルを用いてBlackJackを実装しました。
 - コードフォマッター：Prettier
 - パッケージ管理システム：npm
 
-## Setup
-```zsh
-npm install
-```
-```zsh
-npm run start
-# or
-yarn start
-```
+## Demo
+プレイは[こちら](https://develop--gorgeous-custard-38daf5.netlify.app)をクリック
 
 ## What I learned
 - TypeScriptでの開発の経験と、webpackやnpm scriptsなどの環境構築の経験を得ることができた。
