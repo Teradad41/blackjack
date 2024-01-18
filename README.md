@@ -7,7 +7,7 @@ MVC に従って開発したトランプゲームのブラックジャック
 https://develop--gorgeous-custard-38daf5.netlify.app
 
 ## ✨デモ
-<img width="1680" alt="スクリーンショット 2023-06-14 13 08 52" src="https://github.com/Teradad41/Card_Game/assets/107381511/df12b87e-f32b-42c9-9084-f34caa2cd48b">
+https://github.com/Teradad41/blackjack/assets/107381511/0318b3e3-ebcf-4ee1-9fa5-51d212b8be6a
 
 ## 📝説明
 ルールは標準的なブラックジャックのルールに従います。
