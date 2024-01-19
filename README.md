@@ -1,4 +1,4 @@
-# Project 5 - Blackjack
+# Blackjack
 
 ## 🌱概要
 MVC に従って開発したトランプゲームのブラックジャック
