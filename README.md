@@ -1,15 +1,15 @@
 # Blackjack
 
-## 🌱概要
+## 🌱 概要
 MVC に従って開発したトランプゲームのブラックジャック
 
-## 🏠URL
+## 🏠 URL
 https://develop--gorgeous-custard-38daf5.netlify.app
 
-## ✨デモ
+## ✨ デモ
 https://github.com/Teradad41/blackjack/assets/107381511/0318b3e3-ebcf-4ee1-9fa5-51d212b8be6a
 
-## 📝説明
+## 📝 説明
 ルールは標準的なブラックジャックのルールに従います。
 
 ゲームでは、各プレイヤーはハウスと 1 対 1 で勝負します。
@@ -29,7 +29,7 @@ https://github.com/Teradad41/blackjack/assets/107381511/0318b3e3-ebcf-4ee1-9fa5-
 通常の勝利の場合、返金額は掛け金の 2 倍です。
 ブラックジャックの場合、返金額は掛け金の 2.5 倍です。
 
-## 💾使用技術
+## 💾 使用技術
 <table>
 <tr>
   <th>カテゴリ</th>
@@ -65,19 +65,19 @@ https://github.com/Teradad41/blackjack/assets/107381511/0318b3e3-ebcf-4ee1-9fa5-
 </tr>
 </table>
 
-## 📜作成の経緯
+## 📜 作成の経緯
 - 拡張やリファクタリングが容易な、ソフトウェア設計のモデルである MVC を理解する
 - 開発者としてステップアップするために JavaScript から TypeScript に移行しプロジェクトを完成させる
 - OOP コースで学習した内容をもとに、トランプゲームのモデリングを行う
 - フロントエンドのデザイン力の向上
 
-## 💻学んだこと
+## 💻 学んだこと
 - MVC モデルの構成とそれぞれが果たす役割
 - OOP (クラス、カプセル化）
 - webpack や npm scripts などの環境構築
 - TailWind CSS でのスタイリング
 
-## ⭐️こだわった点
+## ⭐️ こだわった点
 - model の部分はブラックジャック用ではあるが、各メソッドを簡潔に記述した
 - await を使った非同期処理を用いてゲームの流れをリアルに再現した
 - view の部分で DOM を宣言的に操作することでリファクタリングしやすい状態にした
@@ -97,10 +97,10 @@ https://github.com/Teradad41/blackjack/assets/107381511/0318b3e3-ebcf-4ee1-9fa5-
 そのプロジェクトでは、ここで得た経験をもとに複数のゲームに対応できるようにモデリングを行い、以前より拡張・リファクタリングがしやすいような設計ができていると思います。
 → https://github.com/Recursion-group-A/card-game
 
-## 📮今後実装したいこと
+## 📮 今後実装したいこと
 - [ ] リファクタリング
 - [ ] 他のゲームの追加
       
-## 📑参考
+## 📑 参考
 - [TailWind CSS](https://tailwindcss.com)
 - [webpack](https://webpack.js.org)
